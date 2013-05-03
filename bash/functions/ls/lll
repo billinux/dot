@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# http://www.commandlinefu.com/commands/tagged/354/function/sort-by-votes
+
+# Advanced LS Output using Find for Formatted/Sortable File Stat info
+
+# Usage:
+# sort by user: lll -sort=3
+# sort by group reversed:   lll -sort=4 -r
+# sort by modification time:    lll -sort=6
+
+lll ()
+{
+    local a KS="1 -r -g"; sed -n '/-sort=/!Q1' <<< $@ && KS=`sed 's/.*-sort=\(.*\)/\1/g'<<<$@`; find $PWD -maxdepth 1 -printf '%.5m %10M %#9u:%-9g %#5U:%-5G [%AD | %TD | %CD] [%Y] %p\n'|sort -k$KS -bS 50%;
+}
+

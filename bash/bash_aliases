@@ -1,0 +1,464 @@
+#!/bin/bash
+
+# vim: ai ts=2 sw=2 et sts=2
+
+
+# bash aliases (~/.bash/aliases)
+
+# add to ~/.bashrc:     if [ -f ~/.bash/aliases ]; then
+#                           . ~/.bash/aliases
+#                       fi
+
+# interdire l'écrasement de fichier avec >
+#set -c
+
+# alias/*{{{*/
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# sudo/*{{{*/
+# -------------------------------------------------------------------
+# very important for using some aliases with "sudo"
+# http://www.shellperson.net/using-sudo-with-an-alias
+alias sudo='sudo ' # the space following "sudo" tells bash to check if the command that follows the space is also an alias
+# /*}}}*/
+# bookmarks/*{{{*/
+# -------------------------------------------------------------------
+# show pour voir la liste des bookmarks existants
+# save foo sauvergarde le dossier courant dans le bookmark foo
+# cd foo pour y revenir
+if [ ! -f ~/.dirs ]; then  # si ~/.dirs n'existe pas, le créer
+    touch ~/.dirs
+fi
+
+alias show='cat -n ~/.dirs | sed "s/^\([^.]*\)\=\(.*\)/-\1 --> \2/g"'
+save (){ command sed "/!$/d" ~/.dirs > ~/.dirs1; \mv ~/.dirs1 ~/.dirs; echo "$@"=\"`pwd`\" >> ~/.dirs; source ~/.dirs ;}
+source ~/.dirs  # initialisation de la fonction 'save': source le fichier .sdirs
+# *}}}*/
+# grc/*{{{*/
+# -------------------------------------------------------------------
+# http://kassiopeia.juls.savba.sk/~garabik/software/grc.html
+if which grc &>/dev/null; then
+    alias .cl='grc -es --colour=auto'
+    alias configure='.cl ./configure'
+    alias diff='.cl diff'
+    alias git='.cl git'
+    alias make='.cl make'
+    alias gcc='.cl gcc'
+    alias g++='.cl g++'
+    alias ld='.cl ld'
+    alias netstat='.cl netstat'
+    alias ping='.cl ping'
+    alias traceroute='.cl traceroute'
+fi
+# *}}}*/
+# Confirm/*{{{*/
+# -------------------------------------------------------------------
+alias mvi='mv -iv'
+alias cpi='cp -iv'
+alias rmi='rm -iv' # Override -f alias rmf='rm -Rfv' alias cpf='cp -v'
+alias mvf='mv -v'
+# /*}}}*/
+# Cp-mv/*{{{*/
+# -------------------------------------------------------------------
+alias rscp='rsync -aP --no-whole-file --inplace' # rsync cp // a(garder permissions) P(progress bar)
+alias rsmv='rscp --remove-source-files' # rsync mv avec progressbar
+
+# /*}}}*/
+# Grep/*{{{*/
+# -------------------------------------------------------------------
+# alias grep='grep --color=tty -d skip'
+alias gi='grep -i'
+alias fg='fgrep'
+alias eg='egrep'
+alias ag='alias|grep'
+alias hgrep='history | grep'
+alias lgrep='dpkg -l | grep'
+alias sgrep='set|grep'
+alias shoptgrep='shopt|grep'
+# /*}}}*/
+# Ls/*{{{*/
+# -------------------------------------------------------------------
+alias ls='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F' # ls par default (dossier en 1er + mise en forme de l'heure)
+alias lsfp='ls | sed s#^#$(pwd)/#' # ls avec full PATH
+alias ll='ls -l'
+alias la='ls -la'
+alias lt='ls -laptr'
+alias lsi='ls --si -s'
+alias ld='ls -la|grep ^d'
+alias lR='ls -R'
+alias li='ls -i1'
+alias l='ls -CF'
+alias lk='ls -lah | grep ^l' # List only symlinks
+alias l.='ls -d .[[:alnum:]]* 2> /dev/null || echo "No hidden files here..."'
+alias l?='ls .???*'
+# /*}}}*/
+# Network/*{{{*/
+# -------------------------------------------------------------------
+alias tt='telnet'
+alias p4='ping 4.2.2.2 -c 4'            # am I on the internet?
+alias pingtest="ping -c1 $1 { echo 'succes'; } || { echo 'failed'; }"
+alias fastping='ping -c 100 -s.2'       # Do not wait interval 1 second, go fast #
+alias ports="lsof -i -n -P"             # Voir les process qui utilisent une connection internet
+alias estab="ss -p | grep STA"          # Voir seulement les sockets établis 
+alias netstat80="netstat -plan|grep :80|awk {'print $5'}|cut -d: -f 1|sort|uniq -c|sort -nk 1" # nombre de connections sur le port 80 du serveur par IP    
+alias openports="netstat -nape --inet"  # Voir les ports ouverts
+alias netpid="netstat -tlnp"            # Voir le port qui écoute avec le PID du process associé
+alias appson="netstat -lantp | grep -i stab | awk -F/ '{print $2}' | sort | uniq" # Voir une liste des noms de process qui utilisent une connection
+alias netrestart='invoke-rc.d networking stop && sudo invoke-rc.d networking start'
+# *}}}*/
+# Misc/*{{{*/
+# -------------------------------------------------------------------
+# System/*{{{*/
+# ------------------------
+if type -P htop >/dev/null; then
+  alias top='htop' # toujours utiliser htop si installé
+fi
+# top
+alias cpu='top -o cpu'
+alias mem='top -o rsize' # memory
+alias partitions='cat /proc/partitions'
+alias free='free -m'
+alias mountc='mount |column -t'
+alias diskspace="du -S | sort -n -r |more"
+# /*}}}*/
+# Clipboard/*{{{*/
+# ------------------------
+# http://jetpackweb.com/blog/2009/09/23/pbcopy-in-ubuntu-command-line-clipboard/
+# $ cat ~/.ssh/id_dsa.pub | pbcopy
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+#alias pbcopy='xsel --clipboard --input'
+#alias pbpaste='xsel --clipboard --output'
+# /*}}}*/
+# Path/*{{{*/
+# ------------------------
+alias cpwd='pwd|tr -d "\n"|pbcopy'  # copy the working directory path
+#alias cppwd='eval "echo `pwd` | tr -d \\\\n | pbcopy"'
+alias path='echo -e ${PATH//:/\\n}'
+# /*}}}*/
+# Date/*{{{*/
+# ------------------------
+alias now='${tm}'
+alias nowdate='${dt}'
+# Calendrier du mois en cours, en rouge le jour actuel
+alias cal+='var=$(cal -m); echo "${var/$(date +%-d)/$(echo -e "\033[1;31m$(date +%-d)\033[0m")}"'
+alias ccal='var=$(cal -m); echo "${var/$(date +%-d)/$(echo -e "\033[1;31m$(date +%-d)\033[0m")}"'
+# /*}}}*/
+# Source/*{{{*/
+# ------------------------
+alias sbb='source /etc/bash.bashrc'
+alias sb='source ~/.bashrc'
+alias reload_bash="source ~/.bashrc" # recharger le ~/.bashrc
+# /*}}}*/
+# Vi/*{{{*/
+# ------------------------
+if type -P vim >/dev/null; then
+  alias vi=vim # toujours utiliser vim au lieu de vi si installe
+fi
+alias vis='vim "+set si"'
+alias edit='$EDITOR'
+alias vbb='vi /etc/bash.bashrc'
+alias vba='vi /etc/bash_aliases'
+alias va='vi ~/.dotfiles/bash/bash_aliases; source ~/.dotfiles/bash/bash_aliases && echo "aliases sourced"'
+alias vdi='vi /etc/dircolors'
+# /*}}}*/
+# Clear/*{{{*/
+# ------------------------
+alias c='clear'
+bind '"\C-l"':"\"clear\r\"" # Ctrl+l vide le terminal
+# /*}}}*/
+# Misc/*{{{*/
+# ------------------------
+alias head='head -n $((${LINES:-`tput lines 2>/dev/null||echo -n 12`} - 2))'
+alias ncmpc='ncmpc -c' # Ncurse mpc en couleur
+alias lsofnames="lsof | awk '!/^\$/ && /\// { print \$9 }' | sort -u" # noms des fichiers ouverts
+alias bc='bc -l'
+alias mkdir='mkdir -p'
+#alias diff='colordiff'
+alias folders="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
+alias q='exit'
+alias h='history'
+alias log='tail -f /var/log/mail.log|ccze -A'
+alias j='jobs'
+alias p='pwd'
+alias pl='p; ll'
+alias most='most -ct3 -s'
+alias a='alsamixer'
+alias ccze='ccze -A'
+alias bip='putty -load Nom &'
+#alias netrestart="nohup sh -c 'invoke-rc.d networking stop; date; echo sleeping; sleep 2; echo waking; date; invoke-rc.d networking start'"
+alias stat="echo ' ' && uname -a && echo ' '&& uptime &&echo ' '&& df && echo ' '"
+alias shred='shred -zun25'
+# Liste des fichiers de documentation en français pour apache2:
+alias apache_doc_fr='treef /usr/share/doc/apache2-doc/manual/fr | egrep -v /en/ | egrep -v "directories,|^$"'
+# /*}}}*/
+# Delete/*{{{*/
+# ------------------------
+alias rmf='rm -rf'
+alias del='rm -i'
+alias dels='rm --' # delete filename with special character (http://dsl.org/cookbook/cookbook_8.html)
+# /*}}}*/
+# Tree/*{{{*/
+# ------------------------
+alias treef="find . | sed 's/[^/]*\//|   /g;s/| *\([^| ]\)/+--- \1/'"
+alias dirtree='ls -R | grep ":$" | sed -e "s/:$//" -e "s/[^-][^\/]*\//–/g" -e "s/^/ /" -e "s/-/|/"'
+# /*}}}*/
+# Screen/*{{{*/
+# ------------------------
+# http://www.techrepublic.com/blog/opensource/enhance-screen-with-byobus-cool-functionality/2006
+# To use both screen & byobu
+alias screen='screen -c $HOME/.screenrc.org'
+# /*}}}*/
+# Password/*{{{*/
+# ------------------------
+## générateur de mot de passe pwgen
+# ( nécessite que pwgen soit installé )
+alias pwgen-="pwgen -scynB1"
+alias pwgen+="pwgen -scynB 8"
+# /*}}}*/
+# Ps/*{{{*/
+# ------------------------
+#alias ps='ps aux'
+alias myps='/bin/ps -u "$USER" -o user,pid,ppid,pcpu,pmem,args|less'
+alias psp='ps u -C' # ps sur un seul process
+# /*}}}*/
+# -------------------------------------------------------------------
+# /*}}}*/
+# Cd/*{{{*/
+# -------------------------------------------------------------------
+# Use "down" function instead
+#alias cd='cd && ls'
+alias s='cd ..'
+alias u='cd -'
+alias cd..='cd ..'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# /*}}}*/
+# Apps/*{{{*/
+# -------------------------------------------------------------------
+alias e='subl -w . &'
+#/*}}}*/
+# Projects/*{{{*/
+# -------------------------------------------------------------------
+alias proj='cd $HOME/projets/'
+alias projtest='cd $HOME/projets/test/'
+alias projshell='cd $HOME/projets/shell/scripts/'
+alias projpython='cd $HOME/projets/python/'
+alias projvim='cd $HOME/projets/config/dotfiles/vimfiles/repositories/active/vim-get_mod/'
+alias projconf='cd $HOME/projets/config'
+alias coding='cd $HOME/projets/coding/'
+# /*}}}*/
+# Sites/*{{{*/
+# -------------------------------------------------------------------
+
+  if [ -r "/etc/debian_chroot" ] && [ -n "`cat /etc/debian_chroot`" ]; then
+
+    WEB_ROOT='/htdocs/'
+    ROOT_PHP_SITE=$HOME'/srv/www/site/php/'
+
+    alias dev-php='cd '$ROOT_PHP_SITE
+    alias glad='cd '$ROOT_PHP_SITE'glad-conseil.com'$WEB_ROOT
+    #alias test='cd '$ROOT_PHP_SITE'test.com'$WEB_ROOT
+    alias a-z='cd '$ROOT_PHP_SITE'construire-a-z.com'$WEB_ROOT
+    alias seul='cd '$ROOT_PHP_SITE'construire-seul.com'$WEB_ROOT
+    #alias a-z='cd /home/git/srv/www/site/php/construire-a-z.com/htdocs/'
+    alias save_glad-conseil='lftp ftp.glad-conseil.com -e "mirror -e /www/ /home/git/srv/www/backup/php/glad-conseil.com; quit"'
+
+  else
+
+    WEB_ROOT='/'
+    ROOT_PHP_SITE=$HOME'/projets/developpement/php/'
+
+    alias dev-php='cd '$ROOT_PHP_SITE
+    alias glad='cd '$ROOT_PHP_SITE'glad-conseil.com'$WEB_ROOT
+    #alias test='cd '$ROOT_PHP_SITE'test.com'$WEB_ROOT
+    alias a-z='cd '$ROOT_PHP_SITE'construire-a-z.com'$WEB_ROOT
+    alias seul='cd '$ROOT_PHP_SITE'construire-seul.com'$WEB_ROOT
+    alias save_glad-conseil='lftp ftp.glad-conseil.com -e "mirror -e /www/ /home/christian/projets/backup/sites/glad-conseil.com; quit"'
+
+  fi
+
+# http://doc.ubuntu-fr.org/lftp
+# lftp ftp://identifiant:mot_de_passe@site_de_connexion -e "mirror -e -R -x dossier_ignoré -x dossier_ignoré /emplacement_local /emplacement_distant ; quit"
+# lftp ftp://moi:motdepasse@ftp.perso.com -e "mirror -e -R -x gestion/exemples/ -x documents/multimedia/musique/ /var/www/mon_site/ / ; quit"
+#    Le -e commande à lftp d'exécuter ce qui est entre guillemets.
+#    Le mirror crée une copie exacte.
+#    Le -e de mirror efface les fichiers qui n'existent plus.
+#    Le -R signifie que le transfert se fait de l'emplacement local à l'emplacement distant.
+#    Le -x désigne les dossiers qu'il ne faut pas prendre en compte dans le transfert. On met autant de -x dossier_ignoré qu'il y a d'emplacements à ignorer. S'il n'y en a pas, on ne met tout simplement pas de -x. NOTE : Le chemin indiqué pour les dossiers à ignorer dépend du dossier local déclaré.
+#    Le quit coupe la connexion après le transfert.
+
+# Lorsqu'on souhaite juste mettre un fichier sur le serveur distant:
+# lftp ftp://identifiant:mot_de_passe@site_de_connexion -e "put -O /repertoire/fichier/distant/ /chemin/local/du/fichier; quit"
+# Si l'on souhaite rapatrier un fichier:
+# lftp ftp://identifiant:mot_de_passe@site_de_connexion -e "get /repertoire/fichier/distant/ -o /chemin/local/du/fichier; quit"
+
+# /*}}}*/
+# Git/*{{{*/
+# -------------------------------------------------------------------
+
+# Use `hub` as our git wrapper:
+# http://defunkt.github.com/hub/
+# http://defunkt.io/hub/
+# alias it as git
+#hub_path=`which hub`
+#if [ -e hub_path ] ; then
+#    alias git='hub'
+#fi
+
+#alias git='hub'
+
+# Git related
+alias update-git='cd $HOME/bin/git'
+
+# Most of my git aliases are actually “git aliases,” created in my global .gitconfig.
+# These are a few that I find handy on their own:
+# add and remove new/deleted files from git index automatically
+alias gitar="git ls-files -d -m -o -z --exclude-standard | xargs -0 git update-index --add --remove"
+
+# Remove git from a project
+alias ungit="find . -name '.git' -exec rm -rf {} \;"
+
+alias ga='git add'
+alias gb='git branch'
+alias gba='git branch -a'
+alias gc='git commit -v'
+alias gca='git commit -a -m'
+alias gco='git checkout'
+alias gcp='git cherry-pick'
+alias gd='git diff | mate'
+alias ge='git commit --allow-empty -m "Initial commit"'
+alias gg='git grep'
+alias gi='git init'
+alias gk='gitk --all'
+alias gl='git pull --prune'
+# alias gp='git push origin HEAD'
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+alias gp='git push'
+alias gpd="git push origin develop"
+alias gpm="git push origin master"
+alias gs='git status -sb' # upgrade your git if -sb breaks for you. it's fun.
+alias gsb='git show-branch'
+alias gr='git rebase'
+alias gri='git rebase --interactive'
+#alias grm='git rm'
+alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
+# /*}}}*/
+# Ssh/*{{{*/
+# -------------------------------------------------------------------
+alias server='ssh server'
+alias serverp='ssh -p2222 server'
+alias serv='ssh -p2222 git@serv'
+# /*}}}*/
+# Df/*{{{*/
+# -------------------------------------------------------------------
+alias df='df -kTh'
+# occupation disque humainement lisible
+alias dfh='df -hT | egrep "%|/"'
+# Idem, Sans afficher les partitions virtuelles:
+alias df-='df -hT | egrep Sys. && ( df -hT | egrep "^/dev/|^[[:blank:]]" | egrep "^/dev/|[[:digit:]][[:digit:]]*%") '
+# Idem, avec nombre des partitions physiques:
+#alias df+='df -hT 2>&1 | egrep "^/dev|^[[:blank:]]" && (echo -n "Partitions physiques: " ; df -hT | egrep ^/dev/ | wc -l )'
+# Un autre df+
+alias df+="df | egrep Dispo && df -Th | egrep ‘^[/]|^[[:blank:]]|tmp$' |egrep ‘[^[:blank:]]*%|VG_tout-.*$'"
+# Sophistiqué (couleur)
+alias df!="df -hT | egrep '^/dev/[^[:blank:]]*$|[^[:blank:]Uti]*%|[^[:blank:]]*fs|ext[234]'"
+alias tmpfs='df -hT | egrep "Type|tmpfs"'
+alias tmp='df -hT | egrep /tmp$ | egrep [[:digit:]]*% '
+# /*}}}*/
+# Du/*{{{*/
+# -------------------------------------------------------------------
+alias duh='du -h'
+# lisible total seulement
+alias dush='du -sh'
+alias dusort='du -x --block-size=1048576 | sort -nr'
+# /*}}}*/
+# Zfs/*{{{*/
+# -------------------------------------------------------------------
+alias zm="zfs list -o name,used,referenced,canmount,mounted,mountpoint"
+# /*}}}*/
+# Logs/*{{{*/
+# -------------------------------------------------------------------
+alias logt='logtail'
+alias logv='logview'
+alias logr='logrex'
+alias logsys-tail='logtail /var/log/syslog'
+alias logsys-view='logview /var/log/syslog'
+alias logsys-rex='logrex /var/log/syslog'
+# /*}}}*/
+# Apt/*{{{*/
+# -------------------------------------------------------------------
+# Apt-get/*{{{*/
+alias clean='apt-get clean && apt-get autoclean && apt-get dist-clean'
+alias upgrade-simulation='apt-get update && apt-get -s upgrade && apt-get -s dist-upgrade'
+alias upgrade='apt-get update && apt-get upgrade && apt-get dist-upgrade'
+alias install='apt-get install'
+alias install-stable='apt-get -t stable install'
+alias install-testing='apt-get -t testing install'
+alias install-unstable='apt-get -t unstable install'
+alias install-experimental='apt-get -t experimental install'
+alias install-recommends='apt-get --install-recommends install '
+alias install-no-recommends='apt-get --no-install-recommends install '
+alias remove='apt-get remove'
+#alias purge='apt-get remove --purge'
+alias purge="aptitude purge `dpkg --get-selections | grep deinstall | awk '{print $1}'`"
+alias autoremove='apt-get autoremove'
+alias update='apt-get update'
+alias search='apt-cache search'
+alias reinstall='apt-get install --reinstall'
+#/*}}}*/
+# Apt-cache/*{{{*/
+alias apt-show='apt-cache show'
+alias policy='apt-cache policy'
+alias depends='apt-cache depends'
+#/*}}}*/
+# Apt-show/*{{{*/
+#alias show-versions='apt-show-versions -a | grep -i'
+alias show-versions='apt-show-versions -u'
+#/*}}}*/
+# Apt-file/*{{{*/
+alias filelist='apt-file list'
+alias filesearch='apt-file search'
+#/*}}}*/
+# Apt-config/*{{{*/
+alias aptl='apt-config dump | grep Language'
+#/*}}}*/
+
+# /*}}}*/
+# Aptitude/*{{{*/
+# -------------------------------------------------------------------
+alias aptitude-install-simulation='aptitude -s install'
+alias aptitude-install='aptitude install'
+alias aptitude-safe-upgrade-simulation='aptitude -s safe-upgrade'
+alias aptitude-safe-upgrade='aptitude safe-upgrade'
+alias aptitude-full-upgrade-simulation='aptitude -s full-upgrade'
+alias aptitude-full-upgrade='aptitude full-upgrade'
+# /*}}}*/
+# Matos/*{{{*/
+# -------------------------------------------------------------------
+#Température des disques
+alias temphd='for i in a b c d ; do hddtemp /dev/sd$i ; done'
+# cpuinfo
+alias cpuinfo+='less /proc/cpuinfo'
+alias cpuinfo='less /proc/cpuinfo | egrep "processor|cpu MHz|physical id|core id|^$"'
+# /*}}}*/
+# Lvm/*{{{*/
+# -------------------------------------------------------------------
+# Liste des commandes: ( lv n'est pas une commande lvm, mais un éditeur )
+alias lvm_commands="man -k '^pv' ; man -k '^vg' ; man -k '^lv' | egrep -v ^lv[[:blank:]] "
+# INFOS CONCISES: (inclu les droits: sudo)
+alias volumes_info='echo -e " pvs " ;  pvs ; echo -e "\n vgs" ;  vgs ; echo -e "\n lvs" ;  lvs ; echo ; df -h | egrep -v "^tmpfs|^udev|^/dev/hdb"'
+alias lvms=' pvs ; echo ; vgs ; echo ;  lvs'
+# INFOS PLUS DÉTAILLÉES: ( nécessite les droits root: sudo )
+alias vgscan+='echo "df -h | egrep -A1 mapper" && df -h | egrep -A1 mapper'
+alias vgdisplay+=' vgdisplay | egrep "Volume group|VG Name| PE"'
+alias pvdisplay+=' pvdisplay | egrep "Physical|Name|PV Size|Allocatabl"'
+alias lvdisplay+=' lvdisplay | egrep "Logical|Name|Size"'
+alias pvlibresdisplay=' pvdisplay | egrep -A10 "is a new physical vol"'
+alias pvfreedisplay=' pvdisplay | egrep -A10 "is a new physical vol"'
+alias lvm+='vgscan+ && echo && vgdisplay+ && echo && pvdisplay+ && echo && lvdisplay+'
+alias lvminfos='echo -e "volumes_info\t Infos concises\nvgscan+ \tEspace utilisé (df -h)\nvgdisplay+\tGroupe de volumes\npvdisplay+\tVolumes physique: partitions\nlvdisplay+\tVolumes logiques\nlvm+\t= Résumé global"'
+# /*}}}*/
+# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# /*}}}*/

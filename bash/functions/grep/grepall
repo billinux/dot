@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Search for a string inside all files in the current directory
+# Usage:
+# grepall <pattern>
+
+grepal()
+{
+    grep -RnisI $1 *
+}

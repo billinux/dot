@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Check your unread Gmail from the command line
+
+# Usage: 
+# ugmail username
+
+ugmail()
+{
+    curl -u ${1} --silent "https://mail.google.com/mail/feed/atom" | perl -ne 'print "\t" if /<name>/; print "$2\n" if /<(title|name)>(.*)<\/\1>/;'
+}

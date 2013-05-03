@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# http://www.commandlinefu.com/commands/tagged/112/awk/sort-by-votes
+
+# Copy working directory and compress it on-the-fly while showing progress
+# Usage:
+# tarcurrent
+
+tarcurrent()
+{
+    tar -cf - . | pv -s $(du -sb . | awk '{print $1}') | gzip > out.tgz
+}

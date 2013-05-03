@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Easily decode unix-time
+# Usage:
+# utime 1000000000
+# Sat Sep  8 21:46:40 EDT 2001
+
+utime ()
+{
+    date -d @$1;
+}

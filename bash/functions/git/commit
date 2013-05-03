@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Commit
+# Usage:
+# Au lieu de taper:
+# git commit -m "Encore merci et bonne chance, nous sommes avec vous"
+# on tape
+# co encore merci et bonne chance, nous sommes avec vous
+
+commit () {
+    git commit -m "`echo "$*" | sed -e 's/^./\U&\E/g'`"
+}
+alias co=commit;

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Tell local Debian machine to install packages used by remote Debian machine
+# Usage:
+# clone_localhost_from_remotehost <remotehost>
+
+clone_localhost_from_remotehost()
+{
+    ssh $1 'dpkg --get-selections' | dpkg --set-selections && dselect install
+}

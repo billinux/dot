@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# http://www.commandlinefu.com/commands/tagged/354/function/sort-by-votes
+
+# Advanced LS Output using Find for Formatted/Sortable File Stat info
+
+# Usage:
+
+# This function works recursively if you call it with -r as an argument, and sorts by file permissions.
+lsl()
+{
+    O="-maxdepth 1";sed -n '/-r/!Q1'<<<$@ &&O=;find $PWD $O -printf '%.5m %10M %#9u:%-9g %#5U:%-5G [%AD | %TD | %CD] [%Y] %p\n'|sort -rgbS 50%;
+}

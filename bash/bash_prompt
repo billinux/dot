@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# vim: ai ts=2 sw=2 et sts=2
+
+# http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
+
+truncate_pwd () #/*{{{*/
+{
+  # How many characters of the $PWD should be kept
+  local pwdmaxlen=25
+  # Indicate that there has been dir truncation
+  local trunc_symbol=".."
+  local dir=${PWD##*/}
+  pwdmaxlen=$(( ( pwdmaxlen < ${#dir} ) ? ${#dir} : pwdmaxlen ))
+  NEW_PWD=${PWD/#$HOME/\~}
+  local pwdoffset=$(( ${#NEW_PWD} - pwdmaxlen ))
+  if [ ${pwdoffset} -gt "0" ]
+  then
+    NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
+    NEW_PWD=${trunc_symbol}/${NEW_PWD#*/}
+  fi
+}
+#/*}}}*/
+prompt_command () #/*{{{*/
+{
+#    GIT_REP=$(if [ -n "$(_git_prompt)" ]; then echo ${RESET}${bo}GIT::\W${RESET}${bc}${sp}; fi)
+    GIT_REP=$(__gitdir)
+    if [ "$?" -eq 0 ]; then errprompt=""; else errprompt="${sp}${bo}${BOLD}${error_color}error#$?${RESET}${bc}"; fi
+
+    CURRENT_DIR=`pwd|sed -e "s!$HOME!~!"|sed -re "s!([^/])[^/]+/!\1/!g"`
+    NB_FILES=`ls -l | grep "^-" | wc -l`
+    NB_TFILES=`ls -la | grep "^-" | wc -l`
+    NB_SYMFILES=`ls -lah | grep "^l" | wc -l`
+    NB_DIRS=`ls -l | grep "^d" | wc -l`
+    NB_TDIRS=$(($(ls -la | grep "^d" | wc -l)-2))
+    FILES_SIZE=`ls -lah | grep -m 1 total | sed 's/total //'`
+    LOAD=`uptime | awk '{print $(NF-2)}' | sed 's/,/ /2' | tr -d " "`
+}
+#/*}}}*/
+__gitdir () #/*{{{*/
+{
+# http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
+# GIT_PS1_SHOWDIRTYSTATE fait remonter les modifs en working tree (symbole *) et en stage (symbole +)
+# GIT_PS1_SHOWUNTRACKED_FILES fait remonter les fichiers non présents dans l’index (non pris en compte jusqu’à ajout explicite) (symbole %)
+# GIT_PS1_SHOWSTASHSTATE indique qu’on a des trucs dans le stash (symbole $)
+
+  if [ -z "${1-}" ]; then
+    if [ -n "${__git_dir-}" ]; then
+      echo "$__git_dir"
+    elif [ -d .git ]; then
+      echo .git
+    else
+      git rev-parse --git-dir 2>/dev/null
+    fi
+  elif [ -d "$1/.git" ]; then
+    echo "$1/.git"
+  else
+    echo "$1"
+  fi
+}
+#/*}}}*/
+_git_prompt () #/*{{{*/
+{
+  local g="$(__gitdir)"
+  if [ -n "$g" ]; then
+    local r
+    local b
+    if [ -f "$g/rebase-merge/interactive" ]; then
+      r="|REBASE-i"
+      b="$(cat "$g/rebase-merge/head-name")"
+    elif [ -d "$g/rebase-merge" ]; then
+      r="|REBASE-m"
+      b="$(cat "$g/rebase-merge/head-name")"
+    else
+      if [ -d "$g/rebase-apply" ]; then
+        if [ -f "$g/rebase-apply/rebasing" ]; then
+          r="|REBASE"
+        elif [ -f "$g/rebase-apply/applying" ]; then
+          r="|AM"
+        else
+          r="|AM/REBASE"
+        fi
+      elif [ -f "$g/MERGE_HEAD" ]; then
+        r="|MERGING"
+      elif [ -f "$g/BISECT_LOG" ]; then
+        r="|BISECTING"
+      fi
+
+      b="$(git symbolic-ref HEAD 2>/dev/null)" || {
+
+        b="$(
+        case "${GIT_PS1_DESCRIBE_STYLE-}" in
+        (contains)
+          git describe --contains HEAD ;;
+        (branch)
+          git describe --contains --all HEAD ;;
+        (describe)
+          git describe HEAD ;;
+        (* | default)
+          git describe --exact-match HEAD ;;
+        esac 2>/dev/null)" ||
+
+        b="$(cut -c1-7 "$g/HEAD" 2>/dev/null)..." ||
+        b="unknown"
+        b="($b)"
+      }
+    fi
+
+    local w
+    local i
+    local s
+    local u
+    local c
+
+    if [ "true" = "$(git rev-parse --is-inside-git-dir 2>/dev/null)" ]; then
+      if [ "true" = "$(git rev-parse --is-bare-repository 2>/dev/null)" ]; then
+        c="BARE:"
+      else
+        b="GIT_DIR!"
+      fi
+    elif [ "true" = "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ]; then
+      if [ -n "${GIT_PS1_SHOWDIRTYSTATE-}" ]; then
+        if [ "$(git config --bool bash.showDirtyState)" != "false" ]; then
+          git diff --no-ext-diff --ignore-submodules \
+            --quiet --exit-code || w=" working-tree${po}*${pc}"
+          if git rev-parse --quiet --verify HEAD >/dev/null; then
+            git diff-index --cached --quiet \
+              --ignore-submodules HEAD -- || i=" index${po}+${pc}"
+          else
+            i=" index${po}#${pc}"
+          fi
+        fi
+      fi
+      if [ -n "${GIT_PS1_SHOWSTASHSTATE-}" ]; then
+        git rev-parse --verify refs/stash >/dev/null 2>&1 && s=" stash${po}=${pc}"
+      fi
+
+      if [ -n "${GIT_PS1_SHOWUNTRACKEDFILES-}" ]; then
+         if [ -n "$(git ls-files --others --exclude-standard)" ]; then
+           u=" untracked${po}%${pc}"
+         fi
+      fi
+    fi
+
+    if [ -n "${1-}" ]; then
+      printf "$1" "$c${b##refs/heads/}$w$i$s$u$r"
+    else
+      #printf "${bo}%s${bc}" "$c${b##refs/heads/}$w$i$s$u$r"
+      #printf "${bo}%s${bc}" "${PWD##*/}|$c${b##refs/heads/}$w$i$s$u$r"
+      printf "%s" "$c${b##refs/heads/}$w$i$s$u$r"
+    fi
+  fi
+}
+#/*}}}*/
+
+_git_rep () #/*{{{*/
+{
+      printf "%s" "${PWD##*/}"
+}
+#/*}}}*/
+
+bash_prompt () #/*{{{*/
+{
+    AROBAS=${RESET}
+    USER=${GREEN}
+    SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
+
+    [ $UID -eq "0" ] && USER=${RED} && AROBAS=${WHITE}
+
+    if [ -r "/etc/debian_chroot" ] && [ -n "`cat /etc/debian_chroot`" ]; then
+        debian_chroot="${bo}\[${USER}\]CHROOT::`cat /etc/debian_chroot`\[${RESET}\]${bc}${sp}\[${RESET}\]"
+    else
+        debian_chroot=""
+    fi
+
+    export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHSTATE=1
+
+export PS1="\
+\n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
+${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
+${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/\${NB_SYMFILES}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${CYAN}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+\n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
+${debian_chroot}\
+\`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
+${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
+
+export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]"
+
+}
+#/*}}}*/
+
+#${bo}Git::\[${USER}\]${PWD##*/}\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\
+#\$(_git_prompt)\[${RESET}\]\
+
+PROMPT_COMMAND=prompt_command
+bash_prompt
+unset bash_prompt

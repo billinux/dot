@@ -1,0 +1,135 @@
+#!/bin/bash
+
+# vim: ai ts=2 sw=2 et sts=2
+
+
+# LOCALES =====================================================================
+
+# Prefer FR French and use UTF-8
+export LANG="fr_FR"
+export LC_ALL="fr_FR.UTF-8"
+
+# BRACKETS ====================================================================
+
+bo="["
+bc="]"
+po="("
+pc=")"
+sp="─"
+#export sp="───"
+
+# EDITOR ======================================================================
+
+# Make vim the default editor
+if [ -x /usr/bin/vim ]; then
+  export EDITOR="vim"
+elif [ -x /bin/nano ]; then
+    export EDITOR="nano"
+else
+    export EDITOR="vi"
+fi
+
+# HISTORY =====================================================================
+
+# Larger bash history (allow 32³ entries; default is 500)
+# export HISTSIZE=32768
+# Unlimited history
+export HISTSIZE=
+export HISTFILESIZE=$HISTSIZE
+export HISTTIMEFORMAT="${RESET}${bo}${CDH}%d/%m/%Y${RESET}${bc} ${bo}${CHH}%H:%M:%S${RESET}${bc} "
+export HISTCONTROL=ignorespace:erasedups
+export HISTIGNORE="&:[bf]g:ls:cd:u:ll:l:la:l.:su:sbb:s:q:* --help"
+# allow ctrl-S for history navigation (with ctrl-R)
+stty -ixon
+
+# PAGER =======================================================================
+
+if [ -x /usr/bin/most ]; then
+  export PAGER='most -s'
+else
+  export PAGER='less'
+fi
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# ignore case, long prompt, exit if it fits on one screen, allow colors for ls and grep colors
+export LESS="-iMFXR"
+
+# Highlight section titles in manual pages
+export LESS_TERMCAP_md="$ORANGE"
+
+# GREP ========================================================================
+
+# http://blog.amit-agarwal.co.in/2011/03/06/grep_colors-change-the-colors-in-the-grep-output/
+
+# Always enable colored `grep` output
+export GREP_OPTIONS="--color=auto"
+
+# one can set GREP_OPTIONS to "--color=auto --binary-files=without-match --line-number --ignore-case"
+case "$TERM" in
+    linux|xterm*)
+        export GREP_COLOR='01;32'
+        ;;
+    *)
+        export GREP_COLOR='(01);(38;5;46)'
+        ;;
+esac
+
+# GIT ========================================================================
+
+# http://www.git-attitude.fr/2013/04/03/configuration-git/
+# Git credentials
+# Not in the repository, to prevent people from accidentally committing under my name
+export GIT_AUTHOR_NAME="Bill Linux"
+export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+git config --global user.name "$GIT_AUTHOR_NAME"
+export GIT_AUTHOR_EMAIL="bill.linux@laposte.net"
+export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
+git config --global user.email "$GIT_AUTHOR_EMAIL"
+export GIT_EDITOR="$EDITOR"
+
+GIT_HOME=/usr/local
+MANPATH=${GIT_HOME}/share/man:${MANPATH}
+export MANPATH
+
+# MISC ========================================================================
+
+# Export PhantomJS bin's location
+#export PHANTOMJS_BIN="$(brew --prefix)/bin/phantomjs"
+
+# Make new shells get the history lines from all previous
+# shells instead of the default "last window closed" history
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
+
+# CDPATH tells the cd command to look in this colon-separated list of directories for your destination.
+# My preferred order are:
+# 1) the current directory, specified by the empty string between the = and the first colon,
+# 2) the parent directory (so that I can cd lib instead of cd ../lib),
+# 3) my home directory, and 4) my ~/projets directory.
+export CDPATH=:..:~:~/projets
+
+# Make sure pkg-config can find self-compiled software
+# and libraries (installed to ~/usr)
+PKG_CONFIG_PATH=$PKG_CONFIG_PATH:~/usr/lib/pkgconfig
+export PKG_CONFIG_PATH
+
+# Add custom compiled libraries to library search path.
+# You must run the following command to activate path: ldconfig
+# Verify Your New Library Path: ldconfig -v | less
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/local/lib
+export LD_LIBRARY_PATH
+ 
+# Add custom compiled libraries to library run path.
+LD_RUN_PATH=$LD_RUN_PATH:~/local/lib
+export LD_RUN_PATH
+ 
+# Add custom Python modules to the Python path.
+PYTHONPATH=$PYTHONPATH:~/slippenspythonlib
+PYTHONPATH=$PYTHONPATH:~/usr/lib/python2.5/site-packages
+export PYTHONPATH
+
+# Java;s CLASSPATH customization
+CLASSPATH=$CLASSPATH:~/foo/bar.jar
+export CLASSPATH

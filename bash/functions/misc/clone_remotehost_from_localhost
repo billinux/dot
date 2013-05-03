@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# "Clone" a list of installed packages from one Debian/Ubuntu Server to another
+# Usage :
+# clone_remotehost_from_localhost <remotehost>
+
+clone_remotehost_from_localhost()
+{
+    sudo apt-get install `ssh root@$1 "dpkg -l | grep ii" | awk '{print $2}'`
+}

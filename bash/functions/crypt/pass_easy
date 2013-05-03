@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Create strong, but easy to remember password
+
+# Usage:
+# pass_easy 8 (8 characters)
+# pass_easy 16 (16 characters)
+
+pass_easy()
+{
+    read -s pass; echo $pass | md5sum | base64 | cut -c -$1
+}

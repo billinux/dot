@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# declare -f cd
+
+cd () 
+{
+    builtin cd "${@:-$HOME}" && ls -F -G -H -hol
+}

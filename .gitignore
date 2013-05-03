@@ -1,0 +1,12 @@
+# Always-ignore extensions
+*~
+*.swp
+*.diff
+*.log
+*.sass-cache
+bump-version.sh*
+tmp/**/*
+build/*
+bash/bash_infos
+bash/functions/bash/bashtips
+!.gitignore

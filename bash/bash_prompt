@@ -152,7 +152,6 @@ _git_prompt () #/*{{{*/
   fi
 }
 #/*}}}*/
-
 _git_rep () #/*{{{*/
 {
       printf "%s" "${PWD##*/}"
@@ -181,7 +180,7 @@ ${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
 ${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/\${NB_SYMFILES}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${CYAN}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/${CYAN}\${NB_SYMFILES}${PURPLE}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${ORANGE}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 ${debian_chroot}\
 \`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\

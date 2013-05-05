@@ -1,0 +1,161 @@
+# http://blog.blindgaenger.net/advanced_git_aliases.html
+# https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
+
+# http://www.git-attitude.fr/2013/04/03/configuration-git/
+
+[user]
+	name = Bill Linux
+	email = bill.linux@laposte.net
+[alias]
+	s  = status
+    st = status --ignore-submodules=dirty
+    a  = !git add . && git status
+    au = !git add -u && git status
+    aa = !git add . && git add -u && git status
+    # Ajouter rapidement des fichiers à commiter
+    addm = !git-ls-files -m -z | xargs -0 git-add && git status                     # ajouter les fichiers modifiés.
+    addu = !git-ls-files -o --exclude-standard -z | xargs -0 git-add && git status  # ajouter les fichiers inconnus.
+    rmm  = !git ls-files -d -z | xargs -0 git-rm && git status
+    this = !git init && git add . && git commit -m \"initial commit\"               # Initial commit
+	ci = commit -m
+	cm = commit -a -m
+    cu = !git commit -a -m \"Update submodule\"
+    up-sub = !git submodule foreach 'git fetch origin --tags && git checkout master && git pull' && git pull && git submodule update --init --recursive
+	co = checkout
+    cob = checkout -b
+    amend = !git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend
+    # Finding the right commit
+    # If you use shortened hashes, sometimes you may encounter a collision.
+    # The following alias prints out all commits whose hash start with given string.
+    rci = "!sh -c 'git rev-list --all | grep ^$1 | while read commit; do git --no-pager log -n1 --pretty=format:\"%H %ci %an %s%n\" $commit; done' -"
+	br = branch
+    branch-name = !git for-each-ref --format='%(refname:short)' `git symbolic-ref HEAD`
+    # Afficher un historique condensé des commits
+    hci = log --pretty=oneline --abbrev-commit --graph --decorate
+    # Listing the tips of branches in "pu branch" that are not in "next branch"
+    # git tips origin/pu ^origin/next | git oneline
+    oneline ="!_() { $(test $# -eq 0 && echo xargs -L1) git log --no-walk --decorate --oneline \"$@\"; }; _"
+    tips = "!_() { t=$(git rev-list --no-merges --max-count=1 \"$@\"); if test -n \"$t\"; then echo $t; _ \"$@\" ^$t; fi; }; _"
+	l  = log
+	lp = log -p
+    # Afficher les changements réalisés depuis le dernier pull
+    # To list all new commits after you fetched, with stats, but excluding merges
+    lc = log ORIG_HEAD.. --stat --no-merges
+    ll = log --stat --abbrev-commit
+    lo = !git log --decorate --graph --oneline
+    lm = !git log --decorate --graph --oneline --merges
+    #lg = log --graph --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %an, %ar%Creset'
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    llog = log --date=local
+    # Use graphviz for display
+    # $ git graphviz HEAD~100..HEAD~60 | dotty /dev/stdin
+    # $ git graphviz --first-parent master | dotty /dev/stdin
+    graphviz = "!f() { echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}'; }; f"
+    ignore=!([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
+    # To see list of aliases
+    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
+    # To set new alias : $ git alias new_alias original_command
+    set-alias = !sh -c '[ $# = 2 ] && git config --global alias.\"$1\" \"$2\" && exit 0 || echo \"usage: git alias <new alias> <original command>\" >&2 && exit 1' -
+    # To get a list of your defined aliases: 
+    aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /'
+	rb = rebase
+	srb = !git svn fetch && git svn rebase -l
+    # Faire le point rapidement
+    # Wrap commonly used options to git diff, and accept the full range of arguments that diff accepts
+    changes=diff --name-status -r
+    dic = diff --cached
+    diffstat=diff --stat -r
+    # Simple diff ignoring line number changes
+    # Moved around a bunch of lines in data files,
+    # and want a diff of what _else_ happened
+    # (sort --key=1.2 ignores the leading + or -, as does -s to uniq, while -u removes any consequtive lines; I would grep -v '^\(+++ b\|--- a\)
+    sortdiff = !sh -c 'git diff "$@" | grep "^[+-]" | sort --key=1.2 | uniq -u -s1'
+    spull = !git-svn fetch && git-svn rebase
+    spush = !git-svn dcommit
+    # gitk does not follow the common form git-<name>, you have to use the prefix "!" to call gitk
+    gitkconflict = !gitk --left-right HEAD...MERGE_HEAD
+    # You get a lot of merge conflicts and want to quickly solve them using an editor and then add the conflicted files.
+    edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`"
+    add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+    # To see what new commits have been created by the last command (typically after a "git pull")
+    new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
+    # Note that this is dangerous!
+    begin=reset --hard
+    # Reset the last commit
+    undo = git reset --soft HEAD^
+    # Poor man's "stash"
+    stsh = !CURRENT=$(git symbolic-ref HEAD) && git symbolic-ref HEAD refs/heads/stash && git commit -a -m stashed && git checkout $CURRENT
+    # This fires up a git daemon for the repo you are currently in
+    serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+    # git supports appending the arguments to commands prefixed with "!", too.
+    # If you need to perform a reordering, or to use an argument twice, you can use this trick
+    example = !sh -c 'ls $2 $1' -
+    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+    # Using git k instead of gitk may solve your problem
+    k = !gitk --all
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	visual = !gitk
+
+    # https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
+
+    # `git remote prune origin`: remove remote-tracking branches that were deleted from the remote repo
+    # `git gc`: cleanup unnecessary files and optimize the local repository
+    # `git clean -df`: remove untracked files and directories from the working tree
+    # `git stash clear`: remove all stashed states
+    trim = !git remote prune origin && git gc
+    cleanup = !git clean -df && git stash clear
+
+    # Add untracked, remove deleted, and show status
+    adda = !git add -A && git status
+
+    # Fetch a repository ($1) and checkout its ref ($2) HEAD
+    browse = !bash -c 'git fetch "$1" "$2" && git checkout FETCH_HEAD' -
+
+    # Diff what is staged for the next commit
+    diffc = diff --cached
+    # Diff overview
+    diffst = diff --stat
+
+    # Custom graph log (append any tree-ish)
+    graph = log --pretty=nice --date-order --graph
+    # Custom graph log for all branches
+    grapha = log --pretty=nice --date-order --graph --all
+
+    # Custom pretty log
+    logp = log --pretty=nice --date-order
+
+    # Diffstat log
+    logst = log --stat
+    # Short format diffstat log
+    logsf = log --stat --format=oneline --abbrev-commit
+
+    # Find out who is currently active on the repository
+    # Displays committers in descending order of number of commits
+    who = shortlog --numbered --summary --email --no-merges --since="3 months"
+
+
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+    # color opts: normal, black, red, green, yellow, blue, magenta, cyan, or white
+    ui = auto
+    interactive = auto
+[core]
+	pager = less
+    # Use custom `.gitignore` and `.gitattributes`
+    excludesfile = ~/.gitignore
+    attributesfile = ~/.gitattributes
+[push]
+    #default = upstream
+	default = matching
+[merge]
+	tool = vimdiff
+
+[pretty]
+    # tut: http://gitimmersion.com/lab_10.html
+    # ref: http://linux.die.net/man/1/git-log
+    # Result: <short-sha> <commit-message> (<pointer-names>) -- <commit-author-name>; <relative-time>
+    nice = "%C(yellow)%h%C(reset) %C(white)%s%C(cyan)%d%C(reset) -- %an; %ar"

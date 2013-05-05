@@ -1,0 +1,652 @@
+!***********************************************************************************!
+!*+------------------------------------------------------------------+*!
+!*|
+!*|   FILE:     ~/.Xresources
+!*|   DATE:     30.09.2011
+!*|   AUTHOR:   Billinux
+!*|
+!*+------------------------------------------------------------------+*!
+!***********************************************************************************!
+
+
+!+-------------------------------------------------------------------+!
+!|                          RXVT Unicode
+!+-------------------------------------------------------------------+!
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - rxvt - default
+!+-------------------------------------------------------------------+!
+URxvt.loginShell: true
+URxvt.termName: rxvt-256color
+!URxvt.geometry: 150x20+0+157
+URxvt.geometry: 138x28+110+100
+!URxvt.geometry: 180x50+0+0
+URxvt.inheritPixmap: true
+URxvt.reverseVideo:  false
+URxvt.internalBorder: 3
+URxvt.depth: 32
+URxvt.transparent: true
+URxvt.borderless: false
+URxvt.shading: 50
+URxvt.fading: 50
+URxvt.imLocale: fr_FR.UTF-8
+URxvt.cutchars: ()*,<>[]{}|`""''
+URxvt.print-pipe: cat > $(echo urxvt.dump.`date +'%d%M%Y%H%m%S'`)
+URxvt.buffered: true
+URxvt.saveLines: 65535
+
+!+-------------------------------------------------------------------+!
+!|  Colors settings
+!+-------------------------------------------------------------------+!
+!URxvt.foreground: grey75
+!URxvt.background:[80]Black ! true transparency, 0 = clear, 100 = opaque, this is set at 80. 
+!URxvt.tintColor: turquoise
+!URxvt.troughcolor:red
+URxvt.foreground: #f2f2f2
+URxvt.background: #101010
+URxvt.bordercolor: green
+URxvt.underlineColor: #0071FF
+
+URxvt.colorBD: orange
+URxvt.colorIT: #bbbbbb
+URxvt.colorUL: #86a2be
+
+!+-------------------------------------------------------------------+!
+!|  Pointer settings
+!+-------------------------------------------------------------------+!
+!URxvt.pointerBlank : true
+!URxvt.pointerColor: #dc74d1
+URxvt.cursorBlink: true
+URxvt.cursorUnderlline: false
+URxvt.cursorColor: grey75
+
+!+-------------------------------------------------------------------+!
+!|  Scrollbar color
+!+-------------------------------------------------------------------+!
+URxvt.scrollBar: True
+URxvt.scrollstyle: plain ! rxvt (default), plain, next or xterm
+URxvt.scrollColor: grey75
+URxvt.scrollBar_floating: true
+URxvt.scrollBar_right: true
+URxvt.scrollTtyOutput: True
+URxvt.scrollTtyKeypress: True
+URxvt.secondaryScroll: True
+
+!+-------------------------------------------------------------------+!
+!|  Fonts settings
+!+-------------------------------------------------------------------+!
+! run "fc-list" for a list of available fonts
+!URxvt.font: xft:Monospace:pixelsize=16
+!URxvt.boldFont: xft:Monospace:pixelsize=16
+!URxvt.font: xft:Inconsolata-14
+!URxvt.font: xft:consolas:pixelsize=10
+!URxvt.boldFont: xft:consolas:pixelsize=10
+
+URxvt.font: xft:Bitstream Vera Sans Mono:style=Regular:pixelsize=16:antialias=true
+URxvt.boldFont: xft:Bitstream Vera Sans Mono:style=Regular:pixelsize=16:antialias=true ! antialias=false save lot of memory
+URxvt.italicFont: xft:Bitstream Vera Sans Mono:italic:autohint=true
+URxvt.boldItalicFont: xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
+URxvt.tabbed.font: xft:Bitstream Vera Sans Mono:style=Regular:pixelsize=16:antialias=true
+
+!URxvt.font: xft:terminus:pixelsize=16
+!URxvt.font:    xft:Dejavu Sans Mono:pixelsize=16
+!URxvt.boldFont: xft:Dejavu Sans Mono:pixelsize=16
+
+!URxvt.font:			xft:DejaVu Sans Mono:pixelsize=10:autohint=true
+!Urxvt.boldFont:			xft:DejaVu Sans Mono:pixelsize=10:bold:autohint=true
+!Urxvt.italicFont:		xft:DejaVu Sans Mono:pixelsize=10:italic:autohint=true
+!Urxvt.boldItalicFont:		xft:DejaVu Sans Mono:pixelsize=10:bold:italic:autohint=true
+
+!URxvt.font: -misc-fixed-medium-r-normal--20-140-100-100-c-100-iso8859-1
+!URxvt.font1:-misc-nil-medium-r-normal--2-20-75-75-c-10-misc-fontspecific
+!URxvt.font2: -misc-fixed-medium-r-normal--7-70-75-75-c-50-iso8859-1
+!URxvt.font3: -misc-fixed-medium-r-normal--10-100-75-75-c-60-iso8859-1
+!URxvt.font4: -misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-1
+!URxvt.font5: -misc-fixed-medium-r-normal--15-140-75-75-c-90-iso8859-1
+!URxvt.font6: -sony-fixed-medium-r-normal--24-170-100-100-c-120-iso8859-1
+
+
+!Fonst spacing
+!URxvt.letterSpace: -1 !Where -1 decreases the spacing by one pixel, but can be adjusted as needed
+
+!+-------------------------------------------------------------------+!
+!|  Clickable links
+!+-------------------------------------------------------------------+!
+URxvt.perl-ext-common : default,matcher,tabbed
+URxvt.urlLauncher     : /usr/bin/firefox
+URxvt.matcher.button  : 1
+URxvt.underlineURLs: true
+
+!+-------------------------------------------------------------------+!
+!|  Tabs
+!+-------------------------------------------------------------------+!
+URxvt.tabbed.tabbar-fg: 5
+URxvt.tabbed.tabbar-bg: 0
+URxvt.tabbed.tab-fg:    6
+URxvt.tabbed.tab-bg:    0
+
+!+-------------------------------------------------------------------+!
+!|  Key symbol bindings
+!+-------------------------------------------------------------------+!
+!https://github.com/sunaku/.vim/tree/bundle
+
+!URxvt.perl-ext:      default,url-select
+!URxvt.keysym.M-u:    perl:url-select:select_next
+!Rxvt.keysym.Insert: \\e[2~
+!Rxvt.keysym.Home: \\e[1~
+!Rxvt.keysym.Prior: \\e[5~
+!Rxvt.keysym.Select: \\e[3~
+!Rxvt.keysym.End: \\e[4~
+!Rxvt.keysym.Next: \\e[6~
+
+! URxvt.keysym.Home: \033[1~
+! URxvt.keysym.End:  \033[4~
+! URxvt.keysym.F1:   \033[M
+! URxvt.keysym.F2:   \033[N
+! URxvt.keysym.F3:   \033[O
+! URxvt.keysym.F4:   \033[P
+! URxvt.keysym.F5:   \033[Q
+! URxvt.keysym.F6:   \033[R
+! URxvt.keysym.F7:   \033[S
+! URxvt.keysym.F8:   \033[T
+! URxvt.keysym.F9:   \033[U
+! URxvt.keysym.F10:  \033[V
+! URxvt.keysym.F11:  \033[W
+! URxvt.keysym.F12:  \033[X
+
+!+-------------------------------------------------------------------+!
+!|  Pattern marching
+!+-------------------------------------------------------------------+!
+!URxvt.matcher.pattern.1:  \\b(mailto:)[\\w\-\@;\/?:&=%\$_.+!.\x27(),~#]+ [\\w\-\@;\/?:&=%\$_+!.\x27()~]
+!URxvt.matcher.launcher.1: claws-mail
+URxvt.matcher.pattern.1:   \\bhttps?:\/\/(www.youtube|youtube).com\/watch\\?v=([\\w-].)|vimeo.com\/([\\w-].)
+URxvt.matcher.launcher.1:  mtube $0
+URxvt.matcher.pattern.2:   \\bhttps?:\/\/[\\w-.].\/[\\w./?&@#-]..(jpg|jpeg|png)
+URxvt.matcher.launcher.2:  feh $0
+
+
+!+-------------------------------------------------------------------+!
+!|  Default color theme (tango)
+!+-------------------------------------------------------------------+!
+!! Normal & light colors !!
+!
+! color0    black
+URxvt.color0: #101010
+URxvt.color8: #1d202f
+! color1    red
+URxvt.color1: #f13a21
+URxvt.color9: #ff361e
+! color2    green
+URxvt.color2: #93f91d
+URxvt.color10: #ffc005
+! color3    yellow
+URxvt.color3: #ffd00a
+URxvt.color11: #93ff00
+! color4    blue
+URxvt.color4: #004f9e
+URxvt.color12: #0071ff
+! color5    purple
+URxvt.color5: #ec0048
+URxvt.color13: #ef0051
+! color6    cyan
+URxvt.color6: #2aa7e7
+URxvt.color14: #4bb8fd
+! color7    white
+URxvt.color7: #f2f2f2
+URxvt.color15: #a020f0
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - Tomorrow - settings
+!+-------------------------------------------------------------------+!
+!-- Tomorrow Color Scheme
+
+to*foreground: #4d4d4c
+to*background: #ffffff
+! CursorColor (Selection)
+to*cursorColor: #d6d6d6
+
+! Black + Grey (Comment)
+to*color0: #000000
+to*color8: #8e908c
+! Red + Bright Red
+to*color1: #c82829
+to*color9: #ff3334
+! Green + Bright Green
+to*color2: #718c00
+to*color10: #9ec400
+! Yellow (Orange) + Bright Yellow (Yellow)
+to*color3: #f5871f
+to*color11: #eab700
+! Blue + Bright Blue
+to*color4: #4271ae
+to*color12: #5795e6
+! Magenta (Purple) + Bright Magenta
+to*color5: #8959a8
+to*color13: #b777e0
+! Cyan (Aqua) + Bright Cyan
+to*color6: #3e999f
+to*color14: #54ced6
+! Light Grey (Selection) + White (Current Line)
+to*color7: #d6d6d6
+to*color15: #efefef
+
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - vi - settings
+!+-------------------------------------------------------------------+!
+!rxvt -name vi -e vi
+vi.color0:  #6c6c6c
+vi.color8:  #747474
+vi.color1:  #e9897c
+vi.color9:  #f99286
+vi.color2:  #b6e77d
+vi.color10: #c3f786
+vi.color3:  #ecebbe
+vi.color11: #fcfbcc
+vi.color4:  #a9cdeb
+vi.color12: #b6defb
+vi.color5:  #ea96eb
+vi.color13: #fba1fb
+vi.color6:  #c9caec
+vi.color14: #d7d9fc
+vi.color7:  #f2f2f2
+vi.color15: #e2e2e2
+
+vi.iconName: vi
+vi.cursorColor: #bc34de
+vi.cursorColor2: #9a12bc
+vi.pointerColor: #de56ff
+vi.scrollColor: #9a12bc
+vi.troughColor: #79009a
+vi.colorBD: #ffff00
+vi.colorRV: #ffffff
+vi.colorUL: #ffffff
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - tillman - colorscheme
+!+-------------------------------------------------------------------+!
+tillman.background: black
+tillman.foreground: grey
+
+tillman.color0:  #000000
+tillman.color1:  #d36265
+tillman.color2:  #aece91
+tillman.color3:  #e7e18c
+tillman.color4:  #7a7ab0
+tillman.color5:  #963c59
+tillman.color6:  #7f9f7f
+tillman.color7:  gray
+tillman.color8:  gray40
+tillman.color9:  #ef8171
+tillman.color10: #e5f779
+tillman.color11: #f0dfaf
+tillman.color12: #8e9fbc
+tillman.color13: #ef9ebe
+tillman.color14: #71bebe
+tilman.color15: white
+tillman.colorBD: white
+tillman.colorUL: #9b768e
+
+tilman.cursorColor: #6484a4
+tillman.cursorColor2: #880000
+
+tillman.scrollBar: false
+tillman.saveLines: 8192
+tillman.loginShell: false
+
+!tillman.font: smooth
+!tillman.boldFont: smooth
+!tillman.italicFont: smooth
+!tillman.boldItalicFont: smooth
+
+!tillman.inheritPixmap: true
+!tillman.tintColor: #686868
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - lufft - colorscheme
+!+-------------------------------------------------------------------+!
+lufft.foreground: #aaaaaa
+lufft.background: black
+lufft.cursorColor: #ffff00
+lufft.cursorColor2: #880000
+lufft.pointerColor: white
+lufft.color0: #303430
+lufft.color1: #bf7979
+lufft.color2: #97b26b
+lufft.color3: #cdcdc1
+lufft.color4: #86a2be
+lufft.color5: #d9b798
+lufft.color6: #a1b5cd
+lufft.color7: #ffffff
+lufft.color8: #CDB5CD
+lufft.color9: #f4a45f
+lufft.color10: #c5f779
+lufft.color11: #ffffef
+lufft.color12: #98afd9
+lufft.color13: #d7d998
+lufft.color14: #a1b5cd
+lufft.color15: #dedede
+lufft.colorbd: white
+lufft.colorul: #ffffff
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - yaourt - colorscheme
+!+-------------------------------------------------------------------+!
+yaourt.color0  : #424242
+yaourt.color8  : #000000
+yaourt.color1  : #CC0000
+yaourt.color9  : #EF2929
+yaourt.color2  : #4E9A06
+yaourt.color10 : #1CB500
+yaourt.color3  : #C4A000
+yaourt.color11 : #FCE94F
+yaourt.color4  : #3465A4
+yaourt.color12 : #729FCF
+yaourt.color5  : #75507B
+yaourt.color13 : #AD7FA8
+yaourt.color6  : #06989A
+yaourt.color14 : #00F3FF
+yaourt.color7  : #D3D7CF
+yaourt.color15 : #EEEEEC
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - billinux - colorscheme
+!+-------------------------------------------------------------------+!
+billinux.color0  : #000000
+billinux.color8  : #555555
+billinux.color1  : #AA0000
+billinux.color9  : #FF5555
+billinux.color2  : #00AA00
+billinux.color10 : #55FF55
+billinux.color3  : #AA5500
+billinux.color11 : #FFFF55
+billinux.color4  : #0000AA
+billinux.color12 : #5555FF
+billinux.color5  : #AA00AA
+billinux.color13 : #FF55FF
+billinux.color6  : #00AAAA
+billinux.color14 : #55FFFF
+billinux.color7  : #AAAAAA
+billinux.color15 : #FFFFFF
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - carson - colorscheme
+!+-------------------------------------------------------------------+!
+carson.color0  : #2E3436
+carson.color8  : #555753
+carson.color1  : #a31604
+carson.color9  : #c60001
+carson.color2  : #447241
+carson.color10 : #27a343
+carson.color3  : #c1951a
+carson.color11 : #d5a30e
+carson.color4  : #425387
+carson.color12 : #4a5a8d
+carson.color5  : #965d98
+carson.color13 : #893c8c
+carson.color6  : #06989A
+carson.color14 : #12bccb
+carson.color7  : #D3D7CF
+carson.color15 : #EEEEEC
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - guirly - colorscheme
+!+-------------------------------------------------------------------+!
+guirly.cursorColor:  #dc74d1
+guirly.pointerColor: #dc74d1
+guirly.background:   #0e0e0e
+guirly.foreground:   #4ad5e1
+guirly.color0:       #000000
+guirly.color8:       #8b8f93
+guirly.color1:       #dc74d1
+guirly.color9:       #dc74d1
+guirly.color2:       #0eb8c7
+guirly.color10:      #0eb8c7
+guirly.color3:       #dfe37e
+guirly.color11:      #dfe37e
+guirly.color5:       #9e88f0
+guirly.color13:      #9e88f0
+guirly.color6:       #73f7ff
+guirly.color14:      #73f7ff
+guirly.color7:       #e1dddd
+guirly.color15:      #e1dddd
+
+
+!+-------------------------------------------------------------------+!
+!|  Rxvt - molokai - colorscheme
+!+-------------------------------------------------------------------+!
+
+molokai.foreground:#a0a0a0
+molokai.background:#181818
+
+molokai.color0:    #181818
+molokai.color8:    #505354
+molokai.color1:    #ED0F32
+molokai.color9:    #DD314C
+molokai.color2:    #407B2A
+molokai.color10:   #60954B
+molokai.color3:    #fd971f
+molokai.color11:   #feed6c
+molokai.color4:    #13439A
+molokai.color12:   #2A426D
+molokai.color5:    #67479A
+molokai.color13:   #534569
+molokai.color6:    #1F8DA5
+molokai.color14:   #468997
+molokai.color7:    #ccccc6
+molokai.color15:   #f8f8f2
+
+!+-------------------------------------------------------------------+!
+!|                          XTERM
+!+-------------------------------------------------------------------+!
+
+!! XTERM
+!! http://wiki.gcu-squad.org/doku.php?id=bazaar:xresourses
+!! xterm*charClass est une petite ligne magique,
+!! qui permet de sélectionner la plupart des url avec un simple double click.
+!xterm*charClass: 33:48,35:48,37-38:48,43-47:48,58:48,61:48,63-64:48,95:48,126:48
+!xterm*background: black
+!xterm*foreground: LightYellow
+!xterm*scrollBar:false
+!!xterm*faceName:terminus
+!!xterm*faceSize:8
+!xterm*font:-*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*
+!
+!! Précise le nom et la taille des fonts dans le menu (^C+clique droit):
+!! Pour sélectionner le font: $> xterm -fa "fontname"
+!XTerm*fontMenu*fontdefault*Label: Tres grand
+!XTerm*VT100*font:              9x15
+!XTerm*fontMenu*font1*Label:    Illisible
+!XTerm*VT100*font1:             nil2
+!XTerm*fontMenu*font2*Label:    Minuscule
+!XTerm*VT100*font2:             5x7
+!XTerm*fontMenu*font3*Label:    Petit
+!XTerm*VT100*font3:             6x10
+!XTerm*fontMenu*font4*Label:    Normal
+!XTerm*VT100*font4:             fixed
+!XTerm*fontMenu*font5*Label:    Moyen
+!XTerm*VT100*font5:             7x13
+!XTerm*fontMenu*font6*Label:    Tres grand
+!XTerm*VT100*font6:             10x20
+
+
+! Color Codes
+! black
+XTerm*color0:             #242424
+XTerm*color8:             #828282
+! red
+XTerm*color1:             #BF7979
+XTerm*color9:             #F4A45F
+! green
+XTerm*color2:             #97B26B
+XTerm*color10:            #C5F779
+! yellow
+XTerm*color3:             #cdcda1
+XTerm*color11:            #ffffaf
+! blue
+XTerm*color4:             #285A8B
+XTerm*color12:            #98afd9
+! magenta
+XTerm*color5:             #d9b798
+XTerm*color13:            #d7d998
+! cyan
+XTerm*color6:             #a1b5cd
+XTerm*color14:            #a1b5cd
+! white
+XTerm*color7:             #ffffff
+XTerm*color15:            #dedede
+
+!XTerm settings
+!http://invisible-island.net/xterm/xterm.faq.html
+XTerm*geometry: 150x20+0+157
+XTerm*termName: xterm-256color
+XTerm*cursorBlink: false 
+XTerm*cursorColor: #73B8D9 
+XTerm*colorMode: 	true
+XTerm*pointerColor:	blue
+XTerm*pointerColor2: 	yellow
+XTerm*borderWidth:	0
+XTerm*transparent:	true
+XTerm*scrollBar:	false
+XTerm*foreground: #ffffff
+XTerm*background: #000000
+XTerm*loginShell: true 
+XTerm*eightBitInput: false
+XTerm*hideScrollbar: true
+XTerm*hideTabbar: true
+XTerm*hideButton: true
+XTerm*hideMenubar: true
+XTerm*.multiScroll: true
+XTerm*.showBlinkAsBold: true
+XTerm*.utf8: 1
+XTerm*.visualBell: true
+!XTerm*faceName: andale mono
+!XTerm*faceName: terminus:size=13
+XTerm*faceName: droid sans mono:size=12
+XTerm*shadowColor: #222222
+XTerm*saveLines: 10000
+XTerm*on4Clicks: all
+XTerm*colorBDMode: true
+XTerm*on2Clicks:  regex [^ \n]+
+XTerm*on3Clicks: regex (ftp|http|https|mailto|news|nntp|telnet|file|aim):[A-Za-z0-9/](([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2})+(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?
+XTerm*on5Clicks:  line
+XTerm*cutNewline: true
+XTerm*metaSendsEscape: true
+XTerm*locale: utf8
+XTerm*jumpScroll: true
+XTerm*multiScroll: true
+XTerm*scrollTtyOutput: false
+XTerm*scrollKey: true
+
+
+!+-------------------------------------------------------------------+!
+!|                          XCALC
+!+-------------------------------------------------------------------+!
+
+! XCALC
+! xcalc config (toujours classe de mettre des commentaires exotiques)
+xcalc*geometry: 200x275
+xcalc*background: #333333
+xcalc.ti.bevel.background: #111111
+xcalc.ti.bevel.screen.background: #000000
+xcalc.ti.bevel.screen.DEG.background: #000000
+xcalc.ti.bevel.screen.DEG.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.GRAD.background: #000000
+xcalc.ti.bevel.screen.GRAD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.RAD.background: #000000
+xcalc.ti.bevel.screen.RAD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.INV.background: #000000
+xcalc.ti.bevel.screen.INV.foreground: Red
+xcalc.ti.bevel.screen.LCD.background: #000000
+xcalc.ti.bevel.screen.LCD.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.LCD.shadowWidth: 0
+xcalc.ti.bevel.screen.M.background: #000000
+xcalc.ti.bevel.screen.M.foreground: LightSeaGreen
+xcalc.ti.bevel.screen.P.background: #000000
+xcalc.ti.bevel.screen.P.foreground: Yellow
+xcalc.ti.Command.foreground: White
+xcalc.ti.Command.background: #777777
+xcalc.ti.button5.background: Orange3
+xcalc.ti.button19.background: #611161
+xcalc.ti.button18.background: #611161
+xcalc.ti.button20.background: #611111
+xcalc.ti.button25.background: #722222
+xcalc.ti.button30.background: #833333
+xcalc.ti.button35.background: #944444
+xcalc.ti.button40.background: #a55555
+xcalc.ti.button22.background: #222262
+xcalc.ti.button23.background: #222262
+xcalc.ti.button24.background: #222272
+xcalc.ti.button27.background: #333373
+xcalc.ti.button28.background: #333373
+xcalc.ti.button29.background: #333373
+xcalc.ti.button32.background: #444484
+xcalc.ti.button33.background: #444484
+xcalc.ti.button34.background: #444484
+xcalc.ti.button37.background: #555595
+xcalc.ti.button38.background: #555595
+xcalc.ti.button39.background: #555595
+xcalc*Cursor:                 hand2
+xcalc*ShapeStyle:             rectangle
+
+
+!+-------------------------------------------------------------------+!
+!|                          XPDF
+!+-------------------------------------------------------------------+!
+
+! XPDF
+xpdf*background: #333333
+xpdf*foreground: #CCCCCC
+
+!+-------------------------------------------------------------------+!
+!|                          XFONTSEL
+!+-------------------------------------------------------------------+!
+
+! XFONTSEL
+! ---| XFONTSEL |--- {{{
+!XFontSel*sampleText.background: TEXTBG
+! xfontsel - just makes is look less ugly.
+XFontSel*menu*showUnselectable: false
+XFontSel*MenuButton.shadowWidth: 2
+XFontsel*Toggle*ToggleStyle: check
+XFontsel*MenuButton*Justify:    left
+XFontsel*MenuButton*MenuButtonStyle: select
+.xfontsel.pane.commandBox.quitButton.background: #204A87
+.xfontsel.pane.commandBox.quitButton.foreground: #DEDEDE
+.xfontsel.pane.commandBox.ownButton.background: #628ABE
+.xfontsel.pane.commandBox.ownButton.foreground: #DEDEDE
+.xfontsel.pane.commandBox.countLabel.background: #DEDEDE
+.xfontsel.pane.viewPort.sampleText.background: #204A87
+.xfontsel.pane.viewPort.sampleText.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field0.background: #2B4F98
+.xfontsel.pane.fieldBox.field0.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field1.background: #2B4F98
+.xfontsel.pane.fieldBox.field1.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field2.background: #2B4F98
+.xfontsel.pane.fieldBox.field2.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field3.background: #2B4F98
+.xfontsel.pane.fieldBox.field3.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field4.background: #2B4F98
+.xfontsel.pane.fieldBox.field4.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field5.background: #2B4F98
+.xfontsel.pane.fieldBox.field5.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field6.background: #2B4F98
+.xfontsel.pane.fieldBox.field6.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field7.background: #2B4F98
+.xfontsel.pane.fieldBox.field7.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field8.background: #2B4F98
+.xfontsel.pane.fieldBox.field8.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field9.background: #2B4F98
+.xfontsel.pane.fieldBox.field9.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field10.background: #2B4F98
+.xfontsel.pane.fieldBox.field10.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field11.background: #2B4F98
+.xfontsel.pane.fieldBox.field11.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field12.background: #2B4F98
+.xfontsel.pane.fieldBox.field12.foreground: #DEDEDE
+.xfontsel.pane.fieldBox.field13.background: #2B4F98
+.xfontsel.pane.fieldBox.field13.foreground: #DEDEDE
+.xfontsel.pane.fieldBox*foreground: #000000
+.xfontsel.pane.fieldBox.MenuButton.borderWidth: 1
+.xfontsel.pane.fieldBox.MenuButton.internalHeight: 2
+.xfontsel.pane.fieldBox.MenuButton.internalWidth: 3

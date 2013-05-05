@@ -2,6 +2,10 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
+
+
+
+
 if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
 	export TERM=gnome-256color
 elif infocmp xterm-256color >/dev/null 2>&1; then
@@ -70,6 +74,17 @@ if tput setaf 1 &> /dev/null; then
 	RESET=$(tput sgr0)      # Turn off all
 
 else
+
+    # STYLE                         # FOREGROUND        # BACKGROUND
+    # 0 - Reset all attributes      # 30 - Black        # 40 - Black
+    # 1 - Bright                    # 31 - Red          # 41 - Red
+    # 2 - Dim                       # 32 - Green        # 42 - Green
+    # 4 - Underscore                # 33 - Yellow       # 43 - Yellow
+    # 5 - Blink                     # 34 - Blue         # 44 - Blue
+    # 7 - Reverse                   # 35 - Magenta      # 45 - Magenta
+    # 8 - Hidden                    # 36 - Cyan         # 46 - Cyan
+                                    # 37 - White        # 47 - White
+    # Example:\[\e[0;4;37;44m\]
 
     BLACK="\033[1;30m"
 	MAGENTA="\033[1;31m"

@@ -1,0 +1,519 @@
+#! /bin/bash
+# https://bbs.archlinux.org/viewtopic.php?pid=1244804#p1244804
+# Usage:
+# bind -x '"\t":out=$(kingbash.script "$PS1" "$(compgen -A alias -A function)" nohelp); READLINE_LINE=$(echo "$out" | head -n -1); READLINE_POINT=$(echo "$out" | tail -n 1)'
+#
+# Usage Explanation
+# main command: bind -x '"KEY":COMMAND'
+# KEY of \t means tab.
+# COMMAND sets the two $READLINE variables from kingbash.script.
+# kingbash.script needs 2, 3 or 4 arguments:
+# $1 is $PS1 to see how many lines have to be moved up.
+# $2 is a list of aliases and functions used for command completion generated with compgen.
+# $3 and $4 are optionally one of nohelp or dirfirst
+# nohelp removes the helpbar and dirfirst lists directories first always.
+
+function kb_ls() { $(which ls) -1dsqh "$@"; }
+
+function kb_highlight() {
+	case $cmdname in
+#Video
+mplayer|mwrap|mpv|vlc|gmplayer|smplayer|mencoder|kmplayer|Parole|whaawmp|dragonplayer|ffmpeg) 
+extlist='mkv|m4v|mp.|avi|wmv|rmvb|as?|divx|vob|ogm|rm|flv|part|iso|ogg|wav|flac|m4a' ;;
+#Audio
+mpg123|ffsplit|mpg123s|mpg321|mpv|mp3blaster|cmus|cplay|moc|xmms|xmms2|sonata|deadbeef|ogg123|mnama)
+extlist='mp.|aac|wav|ogg|gsm|dct|flac|au|aiff|vox|wma|aac|ra|m4a' ;;
+#PDF
+llpp|xpdf|epdfview|evince|foxit|mupdf|okular|apvlv|zathura)
+extlist='pdf' ;;
+#Images
+feh|geeqie|gqview|eog|gpicview|gthumb|mirage|qiv|ristretto|xnview|xv|viewnior)
+extlist='jpg|jpeg|png|gif|bmp|icon?|tiff?' ;;
+#Games
+sdlmame|openmsx|msxplay|zsnes|desmume|VirtualBoy)
+extlist='rom|dsk' ;;
+#Wine
+wine|winewrap|wineme|winenew|wineconsole)
+extlist='exe|com|bat' ;;
+#Archives
+atool|x|xi|gunzip|extract|unzip|unrar|zip|rar|7z|mcomix|v)
+extlist='tgz|zip|rar|bz2|gz|tar|exe|pk3|lha|Z|lzma' ;;
+#Text
+vim|nano|acme|beaver|geany|leafpad|medit|mousepad|pyroom|sam|vi|gvim|emacs|tea|scite)
+extlist='txt|rc|sh|c|bash|py|ini' ;;
+#Default
+*) extlist='';;
+esac
+}
+
+function kb_listcheck() {
+	for tempfile in $1; do
+		if [[ $dircmd ]]; then
+			if [[ -d "$tempfile" ]]; then
+			displayres+=( "$tempfile" )
+			((colorsw++))
+			else
+			badlist+=( "$tempfile" )
+			fi
+		elif [[ "$extlist" && "$tempfile" =~ \.($extlist)$ ]]; then
+			displayres+=( "$tempfile" )
+			((colorsw++))
+		elif [[ "$2" == executables ]]; then
+			[[ -x "$tempfile" ]] && displayres+=( "$tempfile" )
+		else
+			if [[ "$dirfirst" ]]; then
+				if [[ -d "$tempfile" ]]; then
+					dirlist+=( "$tempfile" )
+				else
+					badlist+=( "$tempfile" )
+				fi
+			else
+				badlist+=( "$tempfile" )
+			fi
+		fi
+	done
+}
+
+function kb_menu() {
+	end=0
+	sel=0
+	change=1
+	lim=12
+	declare -A lslist
+	tput rmam >&2 #don't wrap long lines
+	IFS=$'\n'
+	prompt="$2"
+
+	while ((end==0)); do
+
+	# the [a-z] or [abcd] structure messes up globbing
+	prompt=${prompt//]/\\]}
+	prompt=${prompt//\\\\]/\\]}
+
+	# build a new list
+	if ((change != 0)); then
+		sel=0
+		resetcounter=0
+		change=0
+		if [[ "$1" == command ]]; then
+			[[ $prompt ]] || { read -sn1 -p "Enter first letter" prompt; echo -ne '\e[2K\r' >&2; }
+			displayres=( $( { compgen -A command -A alias -A builtin -A function $prompt; echo "$customcmd" | grep "^$prompt"; } | sort -u) )
+			kb_listcheck "$prompt*" executables
+		elif [[ "$1" == file ]]; then
+			colorsw=0
+			badlist=()
+			dirlist=()
+			displayres=()
+			kb_listcheck "$prompt*"
+		fi
+		[[ "$1" == file ]] && colorsw=${#displayres[@]}
+		displayres+=( "${dirlist[@]}" "${badlist[@]}" )
+		total=${#displayres[@]}
+
+		# on zero results retry without front match
+		if [[ "$1" == file ]] && ((total==0)); then
+			colorsw=0
+			if [[ "${prompt//[^\/]}" ]]; then
+				kb_listcheck "${prompt%/*}/*${prompt##*/}*"
+			else
+				kb_listcheck "*$prompt*"
+			fi
+			colorsw=${#displayres[@]}
+			displayres+=( "${dirlist[@]}" "${badlist[@]}" )
+			total=${#displayres[@]}
+		fi
+		((total==1 && browse==0)) && prompt=${displayres[0]} && break
+		browse=0
+		(( total < lim )) && h=$total || h=$lim
+		pages=$(( total /lim))
+		(( total % lim == 0)) && ((pages--))
+	fi
+	((sel < 0)) && sel=0
+	((sel >= total)) && sel=$((total -1))
+
+	# With F2 and Left, the selected file does not start at 0
+	if [[ "$reset" ]]; then
+	for tempfile in "${displayres[@]}"; do
+		if [[ "${tempfile##*/}" == "${reset##*/}" ]]; then
+			sel=$resetcounter
+			reset=
+			break
+		else
+			((resetcounter++))
+		fi
+	done
+	fi
+
+	page=$((sel /lim))
+	((page==pages))&&lastpage=$'\e[7m'||lastpage=
+	((pages==-1))&&lastpage=$'\e[41m'
+	echo -n  $'\e[0m'"${lastpage}p$page/$pages"$'\e[m'": $before$prompt"$'\e[47m \e[0m ' >&2
+	[[ "$helptext" ]] && echo -n "$helptext" >&2 && helptext=
+
+	for ((count = lim *(sel /lim); count < lim +lim *(sel /lim); count++)); do
+		echo -ne '\e[0m' >&2
+		[[ $count == $total && $page == 0 ]] && break || echo >&2
+
+# The selected file has a X before it
+#		(($sel == $count)) && echo -n "X "$'\e[7m' || echo -n "  " >&2
+
+# The selected file is reverse colored
+		(($sel == $count)) && echo -n $'\e[7m' >&2
+
+# Media files that match the command were counted and now highlighted
+		((count < colorsw)) && echo -ne '\e[1;34m' >&2
+
+		if [[ "$1" == file ]]; then
+
+# Some characters can give errors when a list subscript
+			tempfile=${displayres[$count]//\'}
+			tempfile=${tempfile//[}
+			tempfile=${tempfile//]}
+			tempfile=${tempfile//\`}
+			tempfile=${tempfile//@}
+			tempfile=${tempfile//\*}
+
+			if [[ "$tempfile" ]]; then
+				if ! [[ "${lslist["$tempfile"]}" ]]; then
+
+# Get filesize, or special characters for dirs
+# Store results in lslist, so they don't have to be acquired twice
+					ls_reform=$(kb_ls "${displayres[$count]}")
+[[ -d "${displayres[$count]}" ]] && ls_reform="▓▓▓▓"
+printf -v "lslist[$tempfile]" '%4s|%s' "${ls_reform%% *}" "${displayres[$count]}"
+
+				fi
+				echo -n "${lslist["$tempfile"]}" >&2
+			fi
+		else
+			echo -n "${displayres[$count]}" >&2
+		fi
+		(($sel == $count)) && for ((colcount=0;colcount<cols;colcount++)); do echo -n '          ' >&2; done
+	done
+	if (( $nohelp == 1 )); then
+		echo -e '\e[0m' >&2
+		for item in F1:info F2:command F3:time Left:updir Right:browse Insert:Add\&continue Plus:Add\ all; do
+			echo -ne "\e[40;31m${item/:/\\e[30;41m}\e[m " >&2
+		done
+		echo -ne "\e[0m" >&2
+	fi
+
+	key=$(read -n1 -p "$invisible" -s; echo "$REPLY")
+	[[ $key ]] || key=ENTER
+	#[[ "$key" == ' ' ]] && key=Space
+	if [[ "$key" == $'\e' ]]; then
+		key=ESC
+		while true; do
+			read -n 1 -t 0.01 -s newk
+			[[ "$newk" == $'\e' ]] && newk=ESC
+			key=${key}${newk}
+			[[ -z "$newk" || "$newk" =~ [~A-Da-d] ]] && break
+		done
+	fi
+case "$key" in
+'ESC[A') #UP
+	((sel--));;
+'ESC[B') #DOWN
+	((sel++));;
+'ESC[6~') #PGDN
+	((sel+=lim));;
+'ESC[5~') #PGUP
+	((sel-=lim));;
+'ESC[D') #LEFT
+	change=1
+	browse=1
+	reset=${prompt%/*}
+	reset=$(cd "$reset" 2>/dev/null; pwd -L | sed 's_^.*/__')
+	reset=$reset
+	if [[ ${prompt: -3} == ../ ]]; then
+		prompt+=../
+	elif [[ "${prompt//[^\/]}" == / ]]; then
+		prompt=
+	elif [[ "${prompt//[^\/]}" ]]; then
+		! [[ ${prompt: -1} == / ]] && prompt=${prompt%/*}/
+		prompt=${prompt%/*/*}/
+	else prompt=../
+	fi
+	;;
+'ESC[11~'|'ESCOP') #F1
+	if [[ -d "${displayres[$sel]}" ]]; then
+		helptext=$'\e[31m'"$(/usr/bin/ls "${displayres[$sel]}" | wc -l) files: $(/usr/bin/ls "${displayres[$sel]}" | tr '\n' ' ')"
+	else
+		helptext=$'\e[31m'$(/usr/bin/ls -hlF --quoting-style=shell-always "${displayres[$sel]}")
+	fi
+	;;
+'ESC[C') #RIGHT
+	browse=1 
+	change=1
+	prompt=${displayres[$sel]}
+	[[ -d "$prompt" ]] && prompt+=/ || end=1
+	;;
+'ESC[4~'|'ESC[F'|'ESC[8~'|'ESCOF') #END
+	((sel=$total));; 
+'ESC[1~'|'ESC[H'|'ESC[7~'|'ESCOH') #HOME
+	((sel=0));; 
+'ESC[12~'|'ESCOQ') #F2
+	oldprompt="$prompt" 
+	oldbefore=$before
+	prereset=${displayres[$sel]}
+	before="Enter new command: "
+	for (( count=0; count < $h; count++)); do
+		echo -ne "\e[2K\e[A\r" >&2
+	done
+	echo -ne '\e[2K\r' >&2
+	kb_menu command ""
+	doubleclear=1
+	change=1
+	dircmd=
+	cmdname=$prompt
+	[[ "$cmdname" =~ ^(c|cd|popd|rmdir)$ ]] && dircmd=1
+	kb_highlight
+	end=0
+	before=$cmdname\ ${oldbefore#* }
+	prompt=$oldprompt
+	reset=$prereset
+	;;
+'ESC[13~'|'ESCOR') #F3
+	prompt=$(echo "$prompt" | sed 's/[^/]*$//') 
+	[[ "$prompt" ]] || prompt=.
+	prompt+=/
+	sel=0
+	colorsw=0
+	displayres=( $(/usr/bin/ls -d1qt $prompt*) )
+	;;
+\+) #Plus (All)
+	prompt=
+	for tempfile in "${displayres[@]}"; do
+		kb_write_prompt "$tempfile" before
+	done
+	end=1
+	;;
+'ENTER') #ENTER
+	if [[ $1 == command && -d "${displayres[$sel]}" ]]; then
+		prompt=${displayres[$sel]}/
+		change=1
+	else
+		[[ "${displayres[$sel]}" ]] && prompt="${displayres[$sel]}"
+		end=1
+	fi
+	;; 
+'ESC[2~') #INSERT
+	kb_write_prompt "${displayres[$sel]}" before
+	((sel++))
+	;;
+'ESC') #ESC
+	nospace=1
+	end=1
+	;; 
+$'\x7f'|$'\x08') #BACKSPACE
+	change=1
+	[[ $prompt ]] && prompt=${prompt::-1}
+	;; 
+'ESC'*) #UNUSED KEY
+	: ;; 
+*) #Normal key
+	change=1
+	prompt+=$key
+	;; 
+esac
+	
+	if [[ $doubleclear ]]; then
+		doubleclear=
+	else
+		for (( count=0; count < h + nohelp; count++)); do
+			echo -ne "\e[2K\e[A\r" >&2
+		done
+		echo -ne '\e[2K\r\e[m' >&2
+	fi
+	done
+}
+
+function kb_replace_var() {
+	local var fill
+	OIFS=$IFS
+	IFS=$'\n'
+	[[ "${last//[^~]}" ]] && last="${last/\~/$HOME}" && replaceback[$HOME]='~'
+	[[ "${last//[^$]}" ]] && \
+	for var in $(echo "$last" | /usr/bin/grep -o '\$[a-zA-Z_][a-zA-Z0-9_]*' | tr -d '$'); do
+		fill=${!var}
+		[[ $fill ]] && last="${last/\$$var/$fill}" && replaceback["$fill"]=\$$var
+	done
+	IFS=$OIFS
+}
+
+function kb_write_prompt() {
+	local out escquote lang
+	IFS=$' \t\n'
+	[[ -d "$1" ]] && dir=/ || dir=' '
+	#single quote
+#	(( nospace == 1 )) && { dir= && nospace=; } || nospace=\'
+#	[[ $1 ]] || { nospace=; dir=; }
+#	escquote=${1//\'/\'\\\'\'}
+	#escape
+	(( nospace == 1 )) && dir=
+	nospace=
+	escquote=$(echo "$1" | sed 's/[] !@#^&()`"<>\\{};=|'\''	[]/\\&/g')
+	for fill in ${!replaceback[@]}; do
+		var=${replaceback["$fill"]}
+		escquote=${escquote/$fill/$var}
+	done
+	[[ "$2" == before ]] && before+="$escquote$dir " && return
+	out="$before$nospace$escquote$nospace$dir"
+	lang=$LC_CTYPE
+	LC_CTYPE=C
+	((READLINE_POINT+=${#out} - ${#READFIRST}))
+	LC_CTYPE=$lang
+	READLINE_LINE=$out$READLAST
+}
+
+function kb_output() {
+	echo "$READLINE_LINE"
+	echo "$READLINE_POINT"
+}
+
+trap 'echo -n $'\r' >&2; tput smam >&2; tput cnorm >&2; kb_output; exit' EXIT
+trap 'echo -n $'\r' >&2; tput smam >&2; tput cnorm >&2; exit' INT QUIT TERM HUP
+
+#function kb_main() {
+	nospace=0
+	declare -A replaceback
+	nospace=0
+	invisible=$(tput civis) #turn cursor invisible
+	READFIRST="${READLINE_LINE::$READLINE_POINT}"
+	READLAST="${READLINE_LINE:$READLINE_POINT}"
+	psheight=$( echo -ne "$1" | wc -l); shift
+	customcmd=$1; shift
+	cols=$(( $(tput cols) / 10))
+	IFS=$' \t\n'
+	[[ $1 == dirfirst ]] && dirfirst=1
+	[[ $2 == dirfirst ]] && dirfirst=1
+	[[ $1 == nohelp ]] && nohelp=0
+	[[ $2 == nohelp ]] && nohelp=0
+	[[ $nohelp ]] || nohelp=1
+
+	# if the line has no words, add a tab.
+	if [[ "$READFIRST" =~ ^[[:blank:]]*$ ]]; then
+		IFS=$'\n'
+		read -n 1 -t 0.002 -s key
+		if [[ $key ]]; then
+			IFS=$' \t\n'
+			READLINE_LINE="$READFIRST"$'\t'"$key$READLAST"
+			((READLINE_POINT+=${#key} +1))
+			((psheight > 0)) && echo -ne "\e[${psheight}A" >&2
+			exit
+		fi
+		# put cursor at beginning of line to fill in a command later
+		READLINE_POINT=-999
+	fi
+
+	shopt -s nocaseglob
+	shopt -s nullglob
+	shopt -s dotglob
+	shopt -u globstar
+
+	# count non-escaped quotes
+	quotes=${READFIRST//\\\'}
+	quotes=${quotes//[^\']}
+	quotes=${#quotes}
+
+	# cannot use the last escape
+	[[ "${READFIRST: -1}" == '\' ]] && READFIRST=${READFIRST%\\} && ((READLINE_POINT--))
+
+	# the last word is empty, start completing from scratch
+	if [[ "${READFIRST: -1}" == ' ' && "${READFIRST: -2:1}" != '\' ]] && (( quotes % 2 == 0)); then
+		before=$READFIRST
+		last=
+
+	# complete a command
+	elif [[ "$READFIRST" =~ ^\ *[^=\ ]+$ ]]; then
+		last=$READFIRST
+		kb_replace_var
+		kb_menu command "$last"
+		for fill in ${!replaceback[@]}; do
+			var=${replaceback["$fill"]}
+			prompt=${prompt/$fill/$var}
+		done
+		prompt+=" "
+		((READLINE_POINT+=${#prompt} - ${#READFIRST}))
+		READLINE_LINE=$prompt$READLAST
+		IFS=$' \t\n'
+		((psheight > 0)) && echo -ne "\e[${psheight}A" >&2
+		echo -ne '\r\e[2K' >&2
+		exit
+
+	#variable=filename on first word.
+	elif ! [[ "$READFIRST" =~ \  ]]; then
+		last=$READFIRST
+		before=
+	# complete part of a word
+	else
+		last="${READFIRST##* }"
+		recursive="${READFIRST% *}"
+	fi
+
+	cmdname=$(echo $READFIRST)
+	cmdname=${cmdname%% *}
+	kb_highlight "$cmdname"
+	[[ "$cmdname" =~ ^(c|cd|popd|rmdir)$ ]] && dircmd=1
+
+	# add words that end in \ to the $last word
+	while [[ -z "$before" ]] ; do
+		if [[ "${recursive: -1}" == '\' ]]; then
+			last="${recursive##* } $last"
+			oldrecursive=$recursive
+			recursive=${recursive% *}
+		else
+			before=$recursive\ 
+		fi
+	done
+
+	# for structures like cat 'word1 word2<TAB>
+	if (( quotes % 2 == 1 )) && ! [[ "$last" =~ \' ]]; then
+		# $last will be part of a quote instead.
+		# assume last quote is not escape.
+		before="${READFIRST%\'*}"
+		last="${READFIRST##*\'}"
+	fi
+
+	# for structures like cat 'word1 word2'/<TAB>
+	lastquote="${READFIRST##* }"
+	beforequote="${READFIRST% *}"
+	if [[ "${lastquote//[^\']}" == \' && ${lastquote::1} != \' && "${beforequote}" =~ \ \' ]]; then
+		last=${beforequote##* \'}\ $lastquote
+		before=${beforequote% \'*}\ 
+	fi
+
+	# for variable=filename
+	if [[ "$last" =~ ^[a-zA-Z_][a-zA-Z0-9_]+= ]]; then
+		before=$before${last%%=*}=
+		last=${last#*=}
+	fi
+
+	kb_replace_var
+
+	# for sudo setsid ; etc
+	if [[ "$before" =~ (setsid| do|sudo|which|whatis|whereis|\||\(|&|\{|;)\ *$ ]]; then
+		kb_menu command "$last"
+		for fill in ${!replaceback[@]}; do
+			var=${replaceback["$fill"]}
+			prompt=${prompt/$fill/$var}
+		done
+		((nospace==0)) && prompt+=" "
+		((READLINE_POINT+=${#prompt} - ${#last}))
+		READLINE_LINE=$before$prompt$READLAST
+		IFS=$' \t\n'
+		((psheight > 1)) && echo -ne "\e[${psheight}A" >&2
+		echo -ne "\r\e[2K" >&2
+		exit
+	fi
+
+	# In the case of completion on 'file.t<tab>
+	# the ' must be removed to scan the file.
+	# Completing after typing a ' is then not supported.
+	last=${last//\'}
+
+	kb_menu 'file' "$last"
+	kb_write_prompt "$prompt"
+
+	((psheight > 0)) && echo -ne "\r\e[2K\e[${psheight}A" >&2
+	echo -ne "\r\e[2K" >&2

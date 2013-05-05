@@ -4,6 +4,7 @@
 
 # http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
 
+# Miscelleanous functions
 truncate_pwd () #/*{{{*/
 {
   # How many characters of the $PWD should be kept
@@ -21,6 +22,8 @@ truncate_pwd () #/*{{{*/
   fi
 }
 #/*}}}*/
+
+# Functions for bash_prompt_git
 prompt_command () #/*{{{*/
 {
 #    GIT_REP=$(if [ -n "$(_git_prompt)" ]; then echo ${RESET}${bo}GIT::\W${RESET}${bc}${sp}; fi)
@@ -158,7 +161,53 @@ _git_rep () #/*{{{*/
 }
 #/*}}}*/
 
-bash_prompt () #/*{{{*/
+# Functions for bash_prompt_alt
+prompt_jobs() #/*{{{*/
+{
+    [[ -n "$(jobs)" ]] && printf '{%d}' $(jobs | sed -n '$=')
+}
+#/*}}}*/
+prompt_git() #/*{{{*/
+{
+    git branch &>/dev/null || return 1
+    HEAD="$(git symbolic-ref HEAD 2>/dev/null)"
+    BRANCH="${HEAD##*/}"
+    [[ -n "$(git status 2>/dev/null | \
+        grep -F 'working directory clean')" ]] || STATUS="!"
+    printf '(git:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_hg() #/*{{{*/
+{
+    hg branch &>/dev/null || return 1
+    BRANCH="$(hg branch 2>/dev/null)"
+    [[ -n "$(hg status 2>/dev/null)" ]] && STATUS="!"
+    printf '(hg:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_svn() #/*{{{*/
+{
+    svn info &>/dev/null || return 1
+    URL="$(svn info 2>/dev/null | \
+        awk -F': ' '$1 == "URL" {print $2}')"
+    ROOT="$(svn info 2>/dev/null | \
+        awk -F': ' '$1 == "Repository Root" {print $2}')"
+    BRANCH=${URL/$ROOT}
+    BRANCH=${BRANCH#/}
+    BRANCH=${BRANCH#branches/}
+    BRANCH=${BRANCH%%/*}
+    [[ -n "$(svn status 2>/dev/null)" ]] && STATUS="!"
+    printf '(svn:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_vcs() #/*{{{*/
+{
+    prompt_git || prompt_svn || prompt_hg
+}
+#/*}}}*/
+
+# Different bash_prompt
+bash_prompt_git () #/*{{{*/
 {
     AROBAS=${RESET}
     USER=${GREEN}
@@ -190,10 +239,33 @@ export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]"
 
 }
 #/*}}}*/
+bash_prompt_alt () #/*{{{*/
+{
+    USER=${GREEN}
+    [ $UID -eq "0" ] && USER=${RED}
+    export PS1="\n\[${RESET}\]┌─${bo}\[${BOLD}${USER}\]\u@\h:\w\[${RESET}\]${bc}${sp}${bo}$(prompt_vcs)$(prompt_jobs)${bc}\n└─\$ \[${RESET}\]"
+    export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]"
+}
+#/*}}}*/
+bash_prompt_off () #/*{{{*/
+{
+    USER=${GREEN}
+    [ $UID -eq "0" ] && USER=${RED}
+    export PS1="\n\[${RESET}\]┌─${bo}\[${BOLD}${USER}\]\u@\h:\w\[${RESET}\]${bc}\n└─\$ \[${RESET}\]"
+    export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]"
+}
+#/*}}}*/
 
-#${bo}Git::\[${USER}\]${PWD##*/}\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\
-#\$(_git_prompt)\[${RESET}\]\
+PROMPT=git
+export PROMPT
 
 PROMPT_COMMAND=prompt_command
-bash_prompt
-unset bash_prompt
+
+case ${PROMPT} in
+    git|alt|off)    exec bash_prompt_${PROMPT};unset bash_prompt_${PROMPT} ;;
+    *)              echo "Select your bash_prompt" ;;
+esac
+
+#bash_prompt_git
+
+#unset bash_prompt_on

@@ -18,6 +18,12 @@ pc=")"
 sp="─"
 #export sp="───"
 
+# VARIABLES ===================================================================
+
+export AROBAS=${RESET}
+export USER=${GREEN}
+export SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
+
 # EDITOR ======================================================================
 
 # Make vim the default editor
@@ -78,20 +84,8 @@ esac
 
 # GIT ========================================================================
 
-# http://www.git-attitude.fr/2013/04/03/configuration-git/
-# Git credentials
-# Not in the repository, to prevent people from accidentally committing under my name
-export GIT_AUTHOR_NAME="Bill Linux"
-export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
-git config --global user.name "$GIT_AUTHOR_NAME"
-export GIT_AUTHOR_EMAIL="bill.linux@laposte.net"
-export GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
-git config --global user.email "$GIT_AUTHOR_EMAIL"
-export GIT_EDITOR="$EDITOR"
+export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHSTATE=1
 
-GIT_HOME=/usr/local
-MANPATH=${GIT_HOME}/share/man:${MANPATH}
-export MANPATH
 
 # MISC ========================================================================
 
@@ -101,14 +95,6 @@ export MANPATH
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-
-
-# CDPATH tells the cd command to look in this colon-separated list of directories for your destination.
-# My preferred order are:
-# 1) the current directory, specified by the empty string between the = and the first colon,
-# 2) the parent directory (so that I can cd lib instead of cd ../lib),
-# 3) my home directory, and 4) my ~/projets directory.
-export CDPATH=:..:~:~/projets
 
 # Make sure pkg-config can find self-compiled software
 # and libraries (installed to ~/usr)

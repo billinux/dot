@@ -1,0 +1,38 @@
+#!/bin/bash
+
+
+#set -eox
+set -e
+
+BUILD="build"
+
+# Start from the build directory, where the version file is located
+if [ -f ${BUILD}/version ]; then
+    cd ${BUILD}
+else
+    mkdir ${BUILD} && cd ${BUILD}
+    echo 0 > version
+fi
+
+if [ \! -f version ]; then
+    echo "Can't find version file"
+    exit 1
+fi
+
+# Update the build number in the 'version' file.
+# Separate number from additional alpha/beta/etc marker
+MARKER=`cat version | sed 's/[0-9.]//g'`
+# Bump the number
+VN=`cat version | sed 's/[^0-9.]//g'`
+# Reassemble and write back out
+VN=$(($VN + 1))
+rm -f version.old
+mv version version.old
+chmod +w version.old
+echo $VN$MARKER > version
+VS="$(($VN/1000000)).$(( ($VN/1000)%1000 )).$(( $VN%1000 ))$MARKER"
+cd ..
+
+ANNOUNCE=`date +"%d.%m.%Y à %H:%M:"`" dotfiles $VS released"
+
+while read NEWS;do echo "$ANNOUNCE";echo $NEWS;exit 1;done | tee -a README.md

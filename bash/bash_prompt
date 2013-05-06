@@ -4,6 +4,7 @@
 
 # http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
 
+# Miscelleanous functions
 truncate_pwd () #/*{{{*/
 {
   # How many characters of the $PWD should be kept
@@ -21,6 +22,17 @@ truncate_pwd () #/*{{{*/
   fi
 }
 #/*}}}*/
+_chroot () #/*{{{*/
+{
+    if [ -r "/etc/debian_chroot" ] && [ -n "`cat /etc/debian_chroot`" ]; then
+        echo "${bo}\[${USER}\]CHROOT::`cat /etc/debian_chroot`\[${RESET}\]${bc}${sp}\[${RESET}\]"
+    else
+        echo ""
+    fi
+}
+#/*}}}*/
+
+# Functions for bash_prompt_git
 prompt_command () #/*{{{*/
 {
 #    GIT_REP=$(if [ -n "$(_git_prompt)" ]; then echo ${RESET}${bo}GIT::\W${RESET}${bc}${sp}; fi)
@@ -152,28 +164,61 @@ _git_prompt () #/*{{{*/
   fi
 }
 #/*}}}*/
-
 _git_rep () #/*{{{*/
 {
       printf "%s" "${PWD##*/}"
 }
 #/*}}}*/
 
-bash_prompt () #/*{{{*/
+# Functions for bash_prompt_alt
+prompt_jobs() #/*{{{*/
 {
-    AROBAS=${RESET}
-    USER=${GREEN}
-    SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
+    [[ -n "$(jobs)" ]] && printf '{%d}' $(jobs | sed -n '$=')
+}
+#/*}}}*/
+prompt_git() #/*{{{*/
+{
+    git branch &>/dev/null || return 1
+    HEAD="$(git symbolic-ref HEAD 2>/dev/null)"
+    BRANCH="${HEAD##*/}"
+    [[ -n "$(git status 2>/dev/null | \
+        grep -F 'working directory clean')" ]] || STATUS="!"
+    printf '(git:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_hg() #/*{{{*/
+{
+    hg branch &>/dev/null || return 1
+    BRANCH="$(hg branch 2>/dev/null)"
+    [[ -n "$(hg status 2>/dev/null)" ]] && STATUS="!"
+    printf '(hg:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_svn() #/*{{{*/
+{
+    svn info &>/dev/null || return 1
+    URL="$(svn info 2>/dev/null | \
+        awk -F': ' '$1 == "URL" {print $2}')"
+    ROOT="$(svn info 2>/dev/null | \
+        awk -F': ' '$1 == "Repository Root" {print $2}')"
+    BRANCH=${URL/$ROOT}
+    BRANCH=${BRANCH#/}
+    BRANCH=${BRANCH#branches/}
+    BRANCH=${BRANCH%%/*}
+    [[ -n "$(svn status 2>/dev/null)" ]] && STATUS="!"
+    printf '(svn:%s)' "${BRANCH:-unknown}${STATUS}"
+}
+#/*}}}*/
+prompt_vcs() #/*{{{*/
+{
+    prompt_git || prompt_svn || prompt_hg
+}
+#/*}}}*/
 
-    [ $UID -eq "0" ] && USER=${RED} && AROBAS=${WHITE}
-
-    if [ -r "/etc/debian_chroot" ] && [ -n "`cat /etc/debian_chroot`" ]; then
-        debian_chroot="${bo}\[${USER}\]CHROOT::`cat /etc/debian_chroot`\[${RESET}\]${bc}${sp}\[${RESET}\]"
-    else
-        debian_chroot=""
-    fi
-
-    export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHSTATE=1
+# Different bash_prompt
+bash_prompt_git () #/*{{{*/
+{
+    [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
 
 export PS1="\
 \n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
@@ -181,20 +226,51 @@ ${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
 ${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/\${NB_SYMFILES}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${CYAN}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/${CYAN}\${NB_SYMFILES}${PURPLE}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${ORANGE}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
-${debian_chroot}\
+\$(_chroot)\
 \`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
 ${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
-
-export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]"
-
+}
+#/*}}}*/
+bash_prompt_alt () #/*{{{*/
+{
+    [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
+export PS1="\n\[${RESET}\]┌─${bo}\[${BOLD}${USER}\]\u@\h:\w\[${RESET}\]${bc}\$(prompt_vcs)\$(prompt_jobs)\n└─\$ \[${RESET}\]"
+}
+#/*}}}*/
+bash_prompt_off () #/*{{{*/
+{
+    [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
+export PS1="\
+\n\[${RESET}\]┌─${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
+${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}\
+\n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
+${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
 }
 #/*}}}*/
 
-#${bo}Git::\[${USER}\]${PWD##*/}\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\
-#\$(_git_prompt)\[${RESET}\]\
+# Choose your prompt
 
-PROMPT_COMMAND=prompt_command
-bash_prompt
-unset bash_prompt
+PROMPT=git
+export PROMPT
+
+# Switch Case $PROMPT #/*{{{*/
+case ${PROMPT} in
+    git)    PROMPT_COMMAND=prompt_command;bash_prompt_git;unset bash_prompt_git ;;
+    alt)    bash_prompt_alt;unset bash_prompt_alt;unset bash_prompt_alt ;;
+    off)    bash_prompt_off;unset bash_prompt_off;unset bash_prompt_off ;;
+    *)      echo "Invalid option. Try another one";continue ;;
+esac
+
+# PS2 is the prompt you get when you extend a command over multiple lines
+# by putting at the end of a line and hitting return
+export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]" ;
+
+# PS4 is the prompt shown when you set the debug mode on a shell script using set -x at the top of the script.
+# This echoes each line of the script to STDOUT before executing it.
+# The default prompt is ++. More usefully, you can set it to display the line number, with:
+export PS4='$LINENO+ ';
+
+#/*}}}*/

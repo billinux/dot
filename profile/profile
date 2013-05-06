@@ -1,0 +1,60 @@
+#cat > /etc/profile << "EOF"
+# Début de /etc/profile
+# Écrit pour Beyond Linux From Scratch
+# par James Robertson <jameswrobertson@earthlink.net>
+# modifications par Dagmar d'Surreal <rivyqntzne@pbzpnfg.arg>
+
+# Variables d'environnement globales et programmes de démarrage
+
+# Les alias systèmes et les fonctions doivent aller dans /etc/bashrc. Les
+# variables d'environnements et les programmes de lancement personnels doivent
+# aller dans ~/.bash_profile. Les alias et fonctions personnels doivent aller
+# dans ~/.bashrc.
+
+# Fonction d'aide à la gestion des chemins.
+pathremove () {
+        local IFS=':'
+        local NEWPATH
+        local DIR
+        local PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+                if [ "$DIR" != "$1" ] ; then
+                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+                fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+}
+ 
+pathprepend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+}
+ 
+pathappend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+}
+ 
+if [ $EUID -eq 0 ] ; then
+        unset HISTFILE
+fi
+ 
+# Configuration de quelques variables d'environnement.
+export HISTSIZE=1000
+export HISTIGNORE="&:[bf]g:exit"
+#export PS1="[\u@\h \w]\\$ "
+export PS1='\u@\h:\w\$ '
+ 
+for script in /etc/profile.d/*.sh ; do
+        if [ -x $script ] ; then
+                . $script
+        fi
+done
+ 
+# Now to clean up after ourselves
+unset pathremove pathprepend pathappend 
+
+# Fin /etc/profile
+#EOF

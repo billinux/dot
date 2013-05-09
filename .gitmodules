@@ -1,0 +1,3 @@
+[submodule "dircolors/dircolors.256color"]
+	path = dircolors/dircolors.256color
+	url = git://github.com/billinux/LS_COLORS.git

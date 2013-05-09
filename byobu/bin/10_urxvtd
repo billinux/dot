@@ -1,0 +1,6 @@
+#!/bin/bash
+# http://www.techrepublic.com/blog/opensource/enhance-screen-with-byobus-cool-functionality/2006?tag=rbxccnbtr1
+
+num="$(ps ax|grep urxvtd|grep -v grep|wc -l)"
+
+echo "urxvtd: ${num}"

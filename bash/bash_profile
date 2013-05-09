@@ -13,7 +13,6 @@ elif [[ -s "/usr/local/lib/rvm" ]]; then
   source "/usr/local/lib/rvm"
 fi
 
-
 # FILES INCLUDES ==============================================================
 
 declare -a files=(
@@ -71,7 +70,7 @@ complete -cf sudo
 
 OK=false
 
-if [ -x ~/.dotfiles/bin/kingbash ] && ${OK} ; then
+if [ -x ~/.dotfiles/bin/kingbash -a ${OK} ] ; then
     case "$-" in #to avoid that this command line is used in interactive shells
         *i*)
             bind -x '"\t":out=$(kingbash.script "$PS1" "$(compgen -A alias -A function)" nohelp); READLINE_LINE=$(echo "$out" | head -n -1); READLINE_POINT=$(echo "$out" | tail -n 1)'
@@ -109,6 +108,15 @@ if type -p dircolors >/dev/null 2>&1; then
         fi
     fi
 fi
+
+# INPUTRC =====================================================================
+
+# Setup the INPUTRC environment variable.
+if [ -z "$INPUTRC" -a ! -f "$HOME/.inputrc" ] ; then
+        INPUTRC=/etc/inputrc
+fi
+export INPUTRC
+
 
 # MISC ========================================================================
 

@@ -70,7 +70,7 @@ complete -cf sudo
 
 OK=false
 
-if [ -x ~/.dotfiles/bin/kingbash -a ${OK} ] ; then
+if [ -x ~/.dotfiles/bin/kingbash ] && ${OK} ; then
     case "$-" in #to avoid that this command line is used in interactive shells
         *i*)
             bind -x '"\t":out=$(kingbash.script "$PS1" "$(compgen -A alias -A function)" nohelp); READLINE_LINE=$(echo "$out" | head -n -1); READLINE_POINT=$(echo "$out" | tail -n 1)'

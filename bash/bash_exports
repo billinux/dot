@@ -23,17 +23,53 @@ sp="─"
 export AROBAS=${RESET}
 export USER=${GREEN}
 export SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
+export OS="$(uname -sr|awk '$1=="SunOS"&&$2>5{print"Solaris";exit};{print$1}')"
+export BASEHOSTNAME="`echo "$HOSTNAME" | cut -d. -f1`";
+
+if [ -d ~/tmp ]; then
+    export TMPDIR=~/tmp
+else
+    mkdir ~/tmp 2>/dev/null
+fi
 
 # EDITOR ======================================================================
 
-# Make vim the default editor
-if [ -x /usr/bin/vim ]; then
-  export EDITOR="vim"
-elif [ -x /bin/nano ]; then
-    export EDITOR="nano"
+# Check for the presence of 'vim'.
+VIMPATH=$(type -path vim 2>/dev/null);
+if [ $? -eq 0 ]; then HAVE_VIM=yes; else unset -v HAVE_VIM; fi
+
+if [ "$HAVE_VIM" ]; then
+  function vi { $VIMPATH -O "$@"; }
+  function vim { $VIMPATH -O "$@"; }
+  EDITOR=vim;
 else
-    export EDITOR="vi"
+  EDITOR=vi;
 fi
+
+export EDITOR;
+
+# PAGER =======================================================================
+
+if type -p most >/dev/null 2>&1; then
+    PAGER='most -s'
+elif type -p less >/dev/null 2>&1; then
+    function pager() { less "$@"; }
+    function more()  { less "$@"; }
+    PAGER=less;
+else
+    function pager() { more "$@"; }
+    PAGER=more;
+fi
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# ignore case, long prompt, exit if it fits on one screen, allow colors for ls and grep colors
+export LESS="-iMFXR"
+
+# Highlight section titles in manual pages
+export LESS_TERMCAP_md="$ORANGE"
+
 
 # HISTORY =====================================================================
 
@@ -47,23 +83,6 @@ export HISTCONTROL=ignorespace:erasedups
 export HISTIGNORE="&:[bf]g:ls:cd:u:ll:l:la:l.:su:sbb:s:q:* --help"
 # allow ctrl-S for history navigation (with ctrl-R)
 stty -ixon
-
-# PAGER =======================================================================
-
-if [ -x /usr/bin/most ]; then
-  export PAGER='most -s'
-else
-  export PAGER='less'
-fi
-
-# Don’t clear the screen after quitting a manual page
-export MANPAGER="less -X"
-
-# ignore case, long prompt, exit if it fits on one screen, allow colors for ls and grep colors
-export LESS="-iMFXR"
-
-# Highlight section titles in manual pages
-export LESS_TERMCAP_md="$ORANGE"
 
 # GREP ========================================================================
 

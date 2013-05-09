@@ -157,9 +157,8 @@ _git_prompt () #/*{{{*/
     if [ -n "${1-}" ]; then
       printf "$1" "$c${b##refs/heads/}$w$i$s$u$r"
     else
-      #printf "${bo}%s${bc}" "$c${b##refs/heads/}$w$i$s$u$r"
-      #printf "${bo}%s${bc}" "${PWD##*/}|$c${b##refs/heads/}$w$i$s$u$r"
       printf "%s" "$c${b##refs/heads/}$w$i$s$u$r"
+      #printf "%s" "$c${YELLOW}${b##refs/heads/}${RESET}$w$i$s$u$r"
     fi
   fi
 }
@@ -221,12 +220,12 @@ bash_prompt_git () #/*{{{*/
     [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
 
 export PS1="\
-\n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
-${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
-${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
+\n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${BOLD}${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${BOLD}${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
+${bo}\[${BOLD}${PINK}\]\t\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/${CYAN}\${NB_SYMFILES}${PURPLE}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${ORANGE}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/${CYAN}\${NB_SYMFILES}${PURPLE}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
 \`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\

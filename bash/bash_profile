@@ -3,10 +3,20 @@
 # http://www.bordel-de-nerd.net/2010/08/configurer-son-terminal-bash/#content
 
 # bash_profile
-#$HOME/.rvm/scripts/rvm
+
+# RVM =========================================================================
+
+# rvm initialization
+if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  source "$HOME/.rvm/scripts/rvm"
+elif [[ -s "/usr/local/lib/rvm" ]]; then
+  source "/usr/local/lib/rvm"
+fi
+
+
+# FILES INCLUDES ==============================================================
 
 declare -a files=(
-    $HOME/.rvm/scripts/rvm # Load RVM into a shell session *as a function*
     $HOME/.dotfiles/bash/bash_colors # Colors
     $HOME/.dotfiles/bash/bash_options # Options
     $HOME/.dotfiles/bash/bash_exports # Exports
@@ -27,6 +37,7 @@ done
 
 unset files
 
+# AUTO COMPLETION  ============================================================
 
 # Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
 [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2 | tr ' ' '\n')" scp sftp ssh
@@ -37,12 +48,10 @@ complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes Syste
 # Autocomplete Grunt commands
 which grunt > /dev/null && eval "$(grunt --completion=bash)"
 
-
 # Enable bash completion in interactive shells
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
   . /etc/bash_completion
 fi
-
 
 # Complétion pour les noms d’hôte ssh
 if [ -f ~/.ssh/known_hosts ]; then
@@ -60,7 +69,6 @@ complete -cf sudo
 # Utiliser [Tab] et [Ctrl]-r avec kingbash
 # https://aur.archlinux.org/packages/kingbash/
 
-#OK=false
 OK=false
 
 if [ -x ~/.dotfiles/bin/kingbash ] && ${OK} ; then
@@ -70,8 +78,47 @@ if [ -x ~/.dotfiles/bin/kingbash ] && ${OK} ; then
     esac
 fi
 
-# Enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-  test -r /etc/dircolors && eval "$(dircolors -b /etc/dircolors)" || eval "$(dircolors -b)"
+# DIRCOLORS ===================================================================
+
+# Setup for /bin/ls to support color, the alias is in /etc/bashrc.
+if type -p dircolors >/dev/null 2>&1; then
+    NCOLORS=`tty -s && tput colors 2>/dev/null`
+    if [ -n "${NCOLORS}" -a "${NCOLORS}" -gt 1 -a "${PS1}" ] ; then
+        __TERM_HAS_COLORS="yes"
+
+        if [ "${OS}" = "Linux" ] ; then
+            COLORS=
+            for colors in "$HOME/.dir_colors.$TERM" "$HOME/.dircolors.$TERM" \
+                "$HOME/.dir_colors" "$HOME/.dircolors"; do
+                [ -e "$colors" ] && COLORS="$colors" && break
+            done
+
+            [ -z "$COLORS" ] && [ -e "/etc/dircolors.256color" ] && \
+            [ "x`tty -s && tput colors 2>/dev/null`" = "x256" ] && \
+            COLORS="/etc/dircolors.256color"
+
+            if [ -z "$COLORS" ]; then
+                for colors in "/etc/dircolors.$TERM" "/etc/dircolors"; do
+                    [ -e "$colors" ] && COLORS="$colors" && break
+                done
+            fi
+            # Existence of $COLORS already checked above.
+            if [ -n "$COLORS" ]; then
+                eval "`dircolors --sh "$COLORS" 2>/dev/null`"
+            fi
+        fi
+    fi
 fi
 
+# MISC ========================================================================
+
+# Only do this stuff if we're a non-interactive shell
+if [ -n "$PS1" ]; then
+    # Linux >= 2.2.x supports fancy text mode cursors
+    if [ "$OS" = "Linux" -a "$TERM" = "linux" ]; then
+        __RELEASE=`uname -r`;
+        if [ $(echo $__RELEASE | cut -d. -f1) -ge 2 -a $(echo $__RELEASE | cut -d. -f1) -ge 2 ]; then
+            echo -ne '\033[?64c';
+        fi
+    fi
+fi

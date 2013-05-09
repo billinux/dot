@@ -3,41 +3,98 @@
 # vim: ai ts=2 sw=2 et sts=2
 
 
-# bash_paths
+## bash_paths
+#
+## Directories to be prepended to PATH
+#declare -a dirs_to_prepend=(
+#    "/usr/local/bin" # Ensure that this bin always takes precedence over `/usr/bin`
+#)
+#
+## Directories to be appended to PATH
+#declare -a dirs_to_append=(
+#    "/usr/bin"
+#    "$HOME/bin"
+#    "$HOME/.dotfiles/bin"
+#    "$HOME/.rvm/bin"
+#    "usr/share/npm/bin" # Add npm-installed package bin
+#)
+#
+## Prepend directories to PATH
+#for index in ${!dirs_to_prepend[*]}
+#do
+#    if [ -d ${dirs_to_prepend[$index]} ]; then
+#        # If these directories exist, then prepend them to existing PATH
+#        PATH="${dirs_to_prepend[$index]}:$PATH"
+#    fi
+#done
+#
+## Append directories to PATH
+#for index in ${!dirs_to_append[*]}
+#do
+#    if [ -d ${dirs_to_append[$index]} ]; then
+#        # If these bins exist, then append them to existing PATH
+#        PATH="$PATH:${dirs_to_append[$index]}"
+#    fi
+#done
+#
+#unset dirs_to_prepend dirs_to_append
 
-# Directories to be prepended to PATH
-declare -a dirs_to_prepend=(
-    "/usr/local/bin" # Ensure that this bin always takes precedence over `/usr/bin`
-)
+# Functions to help us manage paths.  Second argument is the name of the
+# path variable to be modified (default: PATH)
+pathremove () {
+        local IFS=':'
+        local NEWPATH
+        local DIR
+        local PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+                if [ "$DIR" != "$1" ] ; then
+                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+                fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+}
 
-# Directories to be appended to PATH
-declare -a dirs_to_append=(
-    "/usr/bin"
-    "$HOME/bin"
-    "$HOME/.dotfiles/bin"
-    "$HOME/.rvm/bin"
-    "usr/share/npm/bin" # Add npm-installed package bin
-)
+pathprepend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+}
 
-# Prepend directories to PATH
-for index in ${!dirs_to_prepend[*]}
-do
-    if [ -d ${dirs_to_prepend[$index]} ]; then
-        # If these directories exist, then prepend them to existing PATH
-        PATH="${dirs_to_prepend[$index]}:$PATH"
-    fi
-done
+pathappend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+}
 
-# Append directories to PATH
-for index in ${!dirs_to_append[*]}
-do
-    if [ -d ${dirs_to_append[$index]} ]; then
-        # If these bins exist, then append them to existing PATH
-        PATH="$PATH:${dirs_to_append[$index]}"
-    fi
-done
+# Set the initial path
+export PATH=/bin:/usr/bin
 
-unset dirs_to_prepend dirs_to_append
+if [ $EUID -eq 0 ] ; then
+        pathappend /sbin:/usr/sbin
+fi
+
+if [ -d /usr/local/lib/pkgconfig ] ; then
+        pathappend /usr/local/lib/pkgconfig PKG_CONFIG_PATH
+fi
+
+if [ -d $HOME/local/bin ]; then
+        pathprepend $HOME/local/bin
+fi
+
+if [ -d /usr/local/bin ]; then
+        pathprepend /usr/local/bin
+fi
+if [ -d /usr/local/sbin -a $EUID -eq 0 ]; then
+        pathprepend /usr/local/sbin
+fi
+
+if [ -d $HOME/bin ]; then
+        pathprepend $HOME/bin
+fi
+
+#if [ $EUID -gt 99 ]; then
+#        pathappend .
+#fi
 
 if [ -e /var/www/yii/framework/ ]; then
   export PATH=$PATH:"/var/www/yii/framework"

@@ -1,78 +1,89 @@
+# http://blog.blindgaenger.net/advanced_git_aliases.html
+# https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
+
+# http://www.git-attitude.fr/2013/04/03/configuration-git/
+
+[user]
+	name = Bill Linux
+	email = bill.linux@laposte.net
 [alias]
-	# View the SHA, description, and history graph of the latest 20 commits
-	l = log --pretty=oneline -n 20 --graph
-	# View the current working tree status using the short format
-	s = status -s
-	# Show the diff between the latest commit and the current state
-	d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
-	# `git di $number` shows the diff between the state `$number` revisions ago and the current state
-	di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
-	# Pull in remote changes for the current repository and all its submodules
-	p = !"git pull; git submodule foreach git pull origin master"
-	# Clone a repository including all submodules
-	c = clone --recursive
-	# Commit all changes
-	ca = !git add -A && git commit -av
-	# Switch to a branch, creating it if necessary
-	go = checkout -B
-	# Show verbose output about tags, branches or remotes
-	tags = tag -l
-	branches = branch -a
-	remotes = remote -v
-	# Credit an author on the latest commit
-	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
-	# Interactive rebase with the given number of latest commits
-	reb = "!r() { git rebase -i HEAD~$1; }; r"
+    commit = commit -v
+    co = checkout
+    ci = commit
+    cs = commit -s
+    br = branch
+    a = !git add . && git add -u && git status
+    am = !git ls-files -m -z | xargs -0 git-add && git status                     # ajouter les fichiers modifiés.
+    au = !git ls-files -o --exclude-standard -z | xargs -0 git-add && git status  # ajouter les fichiers inconnus.
+    rmm  = !git ls-files -d -z | xargs -0 git-rm && git status
+    this = !git init && git add . && git commit -m \"initial commit\"               # Initial commit
+    amend = !git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    ignore=!([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
+    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
+    # Note that this is dangerous!
+    begin=reset --hard
+    # Reset the last commit
+    undo = git reset --soft HEAD^
+    # Poor man's "stash"
+    stsh = !CURRENT=$(git symbolic-ref HEAD) && git symbolic-ref HEAD refs/heads/stash && git commit -a -m stashed && git checkout $CURRENT
+    # This fires up a git daemon for the repo you are currently in
+    serve = !git daemon --reuseaddr --verbose  --base-path=. --export-all ./.git
+    # git supports appending the arguments to commands prefixed with "!", too.
+    # If you need to perform a reordering, or to use an argument twice, you can use this trick
+    example = !sh -c 'ls $2 $1' -
+    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+	unstage = reset HEAD --
+    head = !"git log -n1"
+    heads = !"git log origin/master.. --format='%Cred%h%Creset;%C(yellow)%an%Creset;%H;%Cblue%f%Creset' | git name-rev --stdin --always --name-only | column -t -s';'"
+    fix = commit --amend -C HEAD
+    # https://git.wiki.kernel.org/articles/a/l/i/Aliases.html
 
-[apply]
-	# Detect whitespace errors when applying a patch
-	whitespace = fix
+    # `git remote prune origin`: remove remote-tracking branches that were deleted from the remote repo
+    # `git gc`: cleanup unnecessary files and optimize the local repository
+    # `git clean -df`: remove untracked files and directories from the working tree
+    # `git stash clear`: remove all stashed states
+    trim = !git remote prune origin && git gc
+    cleanup = !git clean -df && git stash clear
 
-[core]
-	# Use custom `.gitignore` and `.gitattributes`
-	excludesfile = ~/.gitignore
-	attributesfile = ~/.gitattributes
-	# Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
-	whitespace = space-before-tab,indent-with-non-tab,trailing-space
+    # Add untracked, remove deleted, and show status
+    adda = !git add -A && git status
 
+    # Fetch a repository ($1) and checkout its ref ($2) HEAD
+    browse = !bash -c 'git fetch "$1" "$2" && git checkout FETCH_HEAD' -
+
+    # Diff what is staged for the next commit
+    diffc = diff --cached
+    # Diff overview
+    diffst = diff --stat
+
+    # Custom graph log (append any tree-ish)
+    graph = log --pretty=nice --date-order --graph
+    # Custom graph log for all branches
+    grapha = log --pretty=nice --date-order --graph --all
+
+    # Custom pretty log
+    logp = log --pretty=nice --date-order
+
+    # Diffstat log
+    logst = log --stat
+    # Short format diffstat log
+    logsf = log --stat --format=oneline --abbrev-commit
+
+    # Find out who is currently active on the repository
+    # Displays committers in descending order of number of commits
+    who = shortlog --numbered --summary --email --no-merges --since="3 months"
 [color]
-	# Use colors in Git commands that are capable of colored output when outputting to the terminal
-	ui = auto
-[color "branch"]
-	current = yellow reverse
-	local = yellow
-	remote = green
-[color "diff"]
-	meta = yellow bold
-	frag = magenta bold
-	old = red bold
-	new = green bold
-[color "status"]
-	added = yellow
-	changed = green
-	untracked = cyan
-[merge]
-	# Include summaries of merged commits in newly created merge commit messages
-	log = true
-
-# Use `origin` as the default remote on the `master` branch in all cases
-[branch "master"]
-	remote = origin
-	merge = refs/heads/master
-
-# URL shorthands
-[url "git@github.com:"]
-	insteadOf = "gh:"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-[url "git://github.com/"]
-	insteadOf = "github:"
-[url "git@gist.github.com:"]
-	insteadOf = "gst:"
-	pushInsteadOf = "gist:"
-	pushInsteadOf = "git://gist.github.com/"
-[url "git://gist.github.com/"]
-	insteadOf = "gist:"
-
+    ui = auto
+[core]
+	pager = less
+    excludesfile = ~/.gitignore
+    attributesfile = ~/.gitattributes
 [push]
-	default = simple
+	default = matching
+[merge]
+	tool = vimdiff
+
+[pretty]
+    nice = "%C(yellow)%h%C(reset) %C(white)%s%C(cyan)%d%C(reset) -- %an; %ar"

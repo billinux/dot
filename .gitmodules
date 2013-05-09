@@ -10,3 +10,6 @@
 [submodule "bin/vcp"]
 	path = bin/vcp
 	url = git://github.com/lynix/vcp
+[submodule "vim/vim-get_mod"]
+	path = vim/vim-get_mod
+	url = git://github.com/billinux/vim-get_mod.git

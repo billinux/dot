@@ -39,8 +39,6 @@ VIMPATH=$(type -path vim 2>/dev/null);
 if [ $? -eq 0 ]; then HAVE_VIM=yes; else unset -v HAVE_VIM; fi
 
 if [ "$HAVE_VIM" ]; then
-  function vi { $VIMPATH -O "$@"; }
-  function vim { $VIMPATH -O "$@"; }
   EDITOR=vim;
 else
   EDITOR=vi;

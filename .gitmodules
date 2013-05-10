@@ -4,12 +4,6 @@
 [submodule "zsh/oh-my-zsh"]
 	path = zsh/oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
-[submodule "bin/git"]
-	path = bin/git
-	url = git://github.com/git/git.git
-[submodule "bin/vcp"]
-	path = bin/vcp
-	url = git://github.com/lynix/vcp
 [submodule "vim/vim-get_mod"]
 	path = vim/vim-get_mod
 	url = git://github.com/billinux/vim-get_mod.git

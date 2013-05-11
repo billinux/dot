@@ -7,3 +7,9 @@
 [submodule "vim/vim-get_mod"]
 	path = vim/vim-get_mod
 	url = git://github.com/billinux/vim-get_mod.git
+[submodule "apps/vcp"]
+	path = apps/vcp
+	url = git://github.com/lynix/vcp
+[submodule "apps/git"]
+	path = apps/git
+	url = git://github.com/git/git.git

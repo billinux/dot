@@ -57,7 +57,7 @@
     stsh = !CURRENT=$(git symbolic-ref HEAD) && git symbolic-ref HEAD refs/heads/stash && git commit -a -m stashed && git checkout $CURRENT
     t = tag
     trim = !git remote prune origin && git gc
-    undo = git reset --soft HEAD^
+    undo = !git reset --soft HEAD^
     wc = whatchanged -p
     whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
     who = shortlog --numbered --summary --email --no-merges --since="3 months"  # Who is active committers on this repository

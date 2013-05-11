@@ -31,11 +31,31 @@ _chroot () #/*{{{*/
     fi
 }
 #/*}}}*/
+_git_dirty() # Returns "*" if the current git branch is dirty./*{{{*/
+{
+  [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo "*"
+}
+#/*}}}*/
+_git_num_unt() # Returns the number of untracked files/*{{{*/
+{
+    echo `git status --porcelain 2>/dev/null| grep "^??" | wc -l` # Number of untracked files
+}
+#/*}}}*/
+_git_num_unc() # Get number of files added to the index (but uncommitted)/*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^(M|A)" | wc -l)
+}
+#/*}}}*/
+_git_num_uncna() # Get number of files that are uncommitted and not added/*{{{*/
+{
+    echo $(git status --porcelain 2>/dev/null| grep "^ M" | wc -l)
+}
+#/*}}}*/
 
 # Functions for bash_prompt_git
 prompt_command () #/*{{{*/
 {
-#    GIT_REP=$(if [ -n "$(_git_prompt)" ]; then echo ${RESET}${bo}GIT::\W${RESET}${bc}${sp}; fi)
     GIT_REP=$(__gitdir)
     if [ "$?" -eq 0 ]; then errprompt=""; else errprompt="${sp}${bo}${BOLD}${error_color}error#$?${RESET}${bc}"; fi
 
@@ -71,6 +91,7 @@ __gitdir () #/*{{{*/
   fi
 }
 #/*}}}*/
+
 _git_prompt () #/*{{{*/
 {
   local g="$(__gitdir)"
@@ -134,10 +155,10 @@ _git_prompt () #/*{{{*/
       if [ -n "${GIT_PS1_SHOWDIRTYSTATE-}" ]; then
         if [ "$(git config --bool bash.showDirtyState)" != "false" ]; then
           git diff --no-ext-diff --ignore-submodules \
-            --quiet --exit-code || w=" working-tree${po}*${pc}"
+              --quiet --exit-code || w=" w-tree${po}$(_git_num_uncna)*${pc}"
           if git rev-parse --quiet --verify HEAD >/dev/null; then
             git diff-index --cached --quiet \
-              --ignore-submodules HEAD -- || i=" index${po}+${pc}"
+                --ignore-submodules HEAD -- || i=" index${po}$(_git_num_unc)+${pc}"
           else
             i=" index${po}#${pc}"
           fi
@@ -149,7 +170,7 @@ _git_prompt () #/*{{{*/
 
       if [ -n "${GIT_PS1_SHOWUNTRACKEDFILES-}" ]; then
          if [ -n "$(git ls-files --others --exclude-standard)" ]; then
-           u=" untracked${po}%${pc}"
+             u=" u-tracked${po}$(_git_num_unt)?${pc}"
          fi
       fi
     fi

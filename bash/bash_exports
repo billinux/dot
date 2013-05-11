@@ -48,9 +48,9 @@ export EDITOR;
 
 # PAGER =======================================================================
 
-if type -p most >/dev/null 2>&1; then
+if type -p most > /dev/null 2>&1; then
     PAGER='most -s'
-elif type -p less >/dev/null 2>&1; then
+elif type -p less > /dev/null 2>&1; then
     function pager() { less "$@"; }
     function more()  { less "$@"; }
     PAGER=less;
@@ -112,27 +112,3 @@ export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHST
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-
-# Make sure pkg-config can find self-compiled software
-# and libraries (installed to ~/usr)
-PKG_CONFIG_PATH=$PKG_CONFIG_PATH:~/usr/lib/pkgconfig
-export PKG_CONFIG_PATH
-
-# Add custom compiled libraries to library search path.
-# You must run the following command to activate path: ldconfig
-# Verify Your New Library Path: ldconfig -v | less
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/local/lib
-export LD_LIBRARY_PATH
- 
-# Add custom compiled libraries to library run path.
-LD_RUN_PATH=$LD_RUN_PATH:~/local/lib
-export LD_RUN_PATH
- 
-# Add custom Python modules to the Python path.
-PYTHONPATH=$PYTHONPATH:~/slippenspythonlib
-PYTHONPATH=$PYTHONPATH:~/usr/lib/python2.5/site-packages
-export PYTHONPATH
-
-# Java;s CLASSPATH customization
-CLASSPATH=$CLASSPATH:~/foo/bar.jar
-export CLASSPATH

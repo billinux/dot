@@ -67,43 +67,70 @@ pathappend () {
 }
 
 # Set the initial path
-export PATH=/bin:/usr/bin
+export PATH=/bin:/usr/bin:/usr/local/games/:/usr/games/
 
 if [ $EUID -eq 0 ] ; then
-        pathappend /sbin:/usr/sbin
+    pathappend /sbin:/usr/sbin
 fi
 
 if [ -d /usr/local/lib/pkgconfig ] ; then
-        pathappend /usr/local/lib/pkgconfig PKG_CONFIG_PATH
-fi
-
-if [ -d $HOME/local/bin ]; then
-        pathprepend $HOME/local/bin
+    pathappend /usr/local/lib/pkgconfig PKG_CONFIG_PATH
 fi
 
 if [ -d /usr/local/bin ]; then
-        pathprepend /usr/local/bin
+    pathprepend /usr/local/bin
 fi
 if [ -d /usr/local/sbin -a $EUID -eq 0 ]; then
-        pathprepend /usr/local/sbin
+    pathprepend /usr/local/sbin
 fi
 
-if [ -d $HOME/bin ]; then
-        pathprepend $HOME/bin
-fi
+for bindir in $HOME/bin $HOME/.dotfiles/bin $HOME/local/bin /opt/*/bin /usr/share/npm/bin ; do
+    if [ -d $bindir ]; then
+        pathprepend ${bindir}
+    fi
+done
 
-#if [ $EUID -gt 99 ]; then
-#        pathappend .
-#fi
-
-if [ -e /var/www/yii/framework/ ]; then
-  export PATH=$PATH:"/var/www/yii/framework"
+if [ -d /var/www/yii/framework/ ]; then
+    pathappend /var/www/yii/framework
 fi
 
 # Set java variables
-if [ -x /usr/bin/java ]; then
-  export JAVA_HOME="/usr/lib/jvm/java-jdk"
-  export PATH=$PATH:${JAVA_HOME}/bin
+# Needed the home of the JDK instead of the JRE
+# Using: JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:bin/javac::")
+if type -p java > /dev/null 2>&1 ; then
+    JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
+    JAVA_HOME=${JAVA_HOME%%/}
+    export CLASSPATH=.:${JAVA_HOME}/lib/
+    pathappend ${JAVA_HOME}/bin
 fi
+
+if [ $EUID -gt 99 ]; then
+    pathappend .
+fi
+
+# Java;s CLASSPATH customization
+#CLASSPATH=$CLASSPATH:~/foo/bar.jar
+#export CLASSPATH
+
+# Make sure pkg-config can find self-compiled software
+# and libraries (installed to ~/usr)
+#PKG_CONFIG_PATH=$PKG_CONFIG_PATH:~/local/lib/pkgconfig
+export PKG_CONFIG_PATH
+
+# Add custom compiled libraries to library search path.
+# You must run the following command to activate path: ldconfig
+# Verify Your New Library Path: ldconfig -v | less
+#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/local/lib
+export LD_LIBRARY_PATH
+ 
+# Add custom compiled libraries to library run path.
+#LD_RUN_PATH=$LD_RUN_PATH:~/local/lib
+export LD_RUN_PATH
+ 
+# Add custom Python modules to the Python path.
+#PYTHONPATH=$PYTHONPATH:~/slippenspythonlib
+#PYTHONPATH=$PYTHONPATH:~/usr/lib/python2.5/site-packages
+export PYTHONPATH
+
 
 export PATH

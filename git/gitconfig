@@ -9,6 +9,7 @@
     au = !git ls-files -o --exclude-standard -z | xargs -0 git-add && git status  # ajouter les fichiers inconnus.
     #begin=reset --hard # Note that this is dangerous!
     br = branch
+    brv = !git br -av
     browse = !bash -c 'git fetch "$1" "$2" && git checkout FETCH_HEAD' - # Fetch a repository ($1) and checkout its ref ($2) HEAD
     commit = commit -v
     c = commit

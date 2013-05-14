@@ -266,12 +266,12 @@ export PS1="\
 \n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${BOLD}${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${BOLD}${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
 ${bo}\[${BOLD}${PINK}\]\t\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\[${RESET}\]:\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
+\`[ $SSH_IP ] && echo \"${RESET}${bo}ssh-from:${BOLD}${SSH_IP}${RESET}${bc}${sp}\"\`\
 ${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
-\`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
+\`[ \$(__gitdir) ] && echo \"${bo}git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
 ${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
 }
 #/*}}}*/

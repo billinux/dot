@@ -13,3 +13,6 @@
 [submodule "apps/git"]
 	path = apps/git
 	url = git://github.com/git/git.git
+[submodule "vim/vimget"]
+	path = vim/vimget
+	url = git://github.com/billinux/vimget.git

@@ -52,6 +52,18 @@ _git_num_uncna() # Get number of files that are uncommitted and not added/*{{{*/
     echo $(git status --porcelain 2>/dev/null| grep "^ M" | wc -l)
 }
 #/*}}}*/
+_git_num_del() # Get number of files deleted to the index (but uncommited) /*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^D" | wc -l)
+}
+#/*}}}*/
+_git_num_delw() # Get number of files deleted to the work-tree /*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^ D" | wc -l)
+}
+#/*}}}*/
 
 # Functions for bash_prompt_git
 prompt_command () #/*{{{*/
@@ -155,10 +167,17 @@ _git_prompt () #/*{{{*/
       if [ -n "${GIT_PS1_SHOWDIRTYSTATE-}" ]; then
         if [ "$(git config --bool bash.showDirtyState)" != "false" ]; then
           git diff --no-ext-diff --ignore-submodules \
-              --quiet --exit-code || w=" w-tree${po}$(_git_num_uncna)*${pc}"
+              --quiet --exit-code || w=" $(if [[ $(_git_num_delw) -gt 0 && $(_git_num_uncna) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_delw)-$(_git_num_uncna)*${pc}; elif [[ $(_git_num_uncna) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_uncna)*${pc}; elif [[ $(_git_num_delw) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_delw)-${pc}; else \
+              echo w-tree${po}*${pc}; fi)"
           if git rev-parse --quiet --verify HEAD >/dev/null; then
             git diff-index --cached --quiet \
-                --ignore-submodules HEAD -- || i=" index${po}$(_git_num_unc)+${pc}"
+                --ignore-submodules HEAD -- || i=" $(if [[ $(_git_num_del) -gt 0 && $(_git_num_unc) -gt 0 ]]; then \
+                echo index${po}$(_git_num_del)-$(_git_num_unc)+${pc}; elif [[ $(_git_num_del) -gt 0 ]]; then \
+            echo index${po}$(_git_num_del)-${pc}; else \
+            echo index${po}$(_git_num_unc)+${pc}; fi)"
           else
               i=" index${po}$(_git_num_unc)#${pc}"
           fi

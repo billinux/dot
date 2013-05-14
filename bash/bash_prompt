@@ -2,6 +2,9 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
+# important:  The \[ and \] escapes delimit non-printing characters sequence.
+# Leaving them out probably breaks some terminal behaviour or internal bash parsing rules
+
 # http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
 
 # Miscelleanous functions
@@ -168,14 +171,14 @@ _git_prompt () #/*{{{*/
         if [ "$(git config --bool bash.showDirtyState)" != "false" ]; then
           git diff --no-ext-diff --ignore-submodules \
               --quiet --exit-code || w=" $(if [[ $(_git_num_delw) -gt 0 && $(_git_num_uncna) -gt 0 ]]; then \
-              echo w-tree${po}$(_git_num_delw)-$(_git_num_uncna)*${pc}; elif [[ $(_git_num_uncna) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_delw)-\|$(_git_num_uncna)*${pc}; elif [[ $(_git_num_uncna) -gt 0 ]]; then \
               echo w-tree${po}$(_git_num_uncna)*${pc}; elif [[ $(_git_num_delw) -gt 0 ]]; then \
               echo w-tree${po}$(_git_num_delw)-${pc}; else \
               echo w-tree${po}*${pc}; fi)"
           if git rev-parse --quiet --verify HEAD >/dev/null; then
             git diff-index --cached --quiet \
                 --ignore-submodules HEAD -- || i=" $(if [[ $(_git_num_del) -gt 0 && $(_git_num_unc) -gt 0 ]]; then \
-                echo index${po}$(_git_num_del)-$(_git_num_unc)+${pc}; elif [[ $(_git_num_del) -gt 0 ]]; then \
+                echo index${po}$(_git_num_del)-\|$(_git_num_unc)+${pc}; elif [[ $(_git_num_del) -gt 0 ]]; then \
             echo index${po}$(_git_num_del)-${pc}; else \
             echo index${po}$(_git_num_unc)+${pc}; fi)"
           else

@@ -29,5 +29,5 @@ git config --global user.email "$GIT_AUTHOR_EMAIL"
 # 1) the current directory, specified by the empty string between the = and the first colon,
 # 2) the parent directory (so that I can cd lib instead of cd ../lib),
 # 3) my home directory, and 4) my ~/projets directory.
-export CDPATH=:..:~:~/projets
+# export CDPATH=:..:~:~/projets
 

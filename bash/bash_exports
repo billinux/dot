@@ -23,7 +23,10 @@ sp="─"
 export AROBAS=${RESET}
 export USER=${GREEN}
 export SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
-export OS="$(uname -sr|awk '$1=="SunOS"&&$2>5{print"Solaris";exit};{print$1}')"
+
+[ "$(uname -s)" == [Ll]inux ] || export OS="$(lsb_release -si)"
+
+
 export BASEHOSTNAME="`echo "$HOSTNAME" | cut -d. -f1`";
 
 if [ -d ~/tmp ]; then

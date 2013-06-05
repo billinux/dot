@@ -108,6 +108,9 @@
 [diff]
     renames = true    # Detect renames of files
 
+[github]
+    user = billinux
+
 [grep]
     lineNumber = true
     extendedRegexp = true

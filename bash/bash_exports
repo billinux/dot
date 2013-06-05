@@ -80,7 +80,7 @@ export LESS_TERMCAP_md="$ORANGE"
 export HISTSIZE=
 export HISTFILESIZE=$HISTSIZE
 export HISTTIMEFORMAT="${RESET}${bo}${CDH}%d/%m/%Y${RESET}${bc} ${bo}${CHH}%H:%M:%S${RESET}${bc} "
-export HISTCONTROL=ignorespace:erasedups
+export HISTCONTROL=erasedups:ignorespace
 export HISTIGNORE="&:[bf]g:ls:cd:u:ll:l:la:l.:su:sbb:s:q:* --help"
 # allow ctrl-S for history navigation (with ctrl-R)
 stty -ixon
@@ -105,7 +105,6 @@ esac
 # GIT ========================================================================
 
 export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHSTATE=1
-
 
 # MISC ========================================================================
 

@@ -2,43 +2,6 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
-
-## bash_paths
-#
-## Directories to be prepended to PATH
-#declare -a dirs_to_prepend=(
-#    "/usr/local/bin" # Ensure that this bin always takes precedence over `/usr/bin`
-#)
-#
-## Directories to be appended to PATH
-#declare -a dirs_to_append=(
-#    "/usr/bin"
-#    "$HOME/bin"
-#    "$HOME/.dotfiles/bin"
-#    "$HOME/.rvm/bin"
-#    "usr/share/npm/bin" # Add npm-installed package bin
-#)
-#
-## Prepend directories to PATH
-#for index in ${!dirs_to_prepend[*]}
-#do
-#    if [ -d ${dirs_to_prepend[$index]} ]; then
-#        # If these directories exist, then prepend them to existing PATH
-#        PATH="${dirs_to_prepend[$index]}:$PATH"
-#    fi
-#done
-#
-## Append directories to PATH
-#for index in ${!dirs_to_append[*]}
-#do
-#    if [ -d ${dirs_to_append[$index]} ]; then
-#        # If these bins exist, then append them to existing PATH
-#        PATH="$PATH:${dirs_to_append[$index]}"
-#    fi
-#done
-#
-#unset dirs_to_prepend dirs_to_append
-
 # Functions to help us manage paths.  Second argument is the name of the
 # path variable to be modified (default: PATH)
 pathremove () {
@@ -94,13 +57,14 @@ if [ -d /var/www/yii/framework/ ]; then
     pathappend /var/www/yii/framework
 fi
 
+# JAVA =====================================================================
 # Set java variables
 # Needed the home of the JDK instead of the JRE
 # Using: JAVA_HOME=$(readlink -f /usr/bin/javac | sed "s:bin/javac::")
 if type -p java > /dev/null 2>&1 ; then
     JAVA_HOME=$(readlink -f `which javac` | sed "s:bin/javac::")
     JAVA_HOME=${JAVA_HOME%%/}
-    export CLASSPATH=.:${JAVA_HOME}/lib/
+    export CLASSPATH=.:${JAVA_HOME}/lib/ # :~/foo/bar.jar
     pathappend ${JAVA_HOME}/bin
 fi
 
@@ -108,29 +72,44 @@ if [ $EUID -gt 99 ]; then
     pathappend .
 fi
 
-# Java;s CLASSPATH customization
-#CLASSPATH=$CLASSPATH:~/foo/bar.jar
-#export CLASSPATH
+# Local libraries
+LOCAL="${HOME}/local"
 
-# Make sure pkg-config can find self-compiled software
-# and libraries (installed to ~/usr)
-#PKG_CONFIG_PATH=$PKG_CONFIG_PATH:~/local/lib/pkgconfig
-export PKG_CONFIG_PATH
+if [ -d ${LOCAL} ]; then
 
-# Add custom compiled libraries to library search path.
-# You must run the following command to activate path: ldconfig
-# Verify Your New Library Path: ldconfig -v | less
-#LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/local/lib
-export LD_LIBRARY_PATH
- 
-# Add custom compiled libraries to library run path.
-#LD_RUN_PATH=$LD_RUN_PATH:~/local/lib
-export LD_RUN_PATH
- 
-# Add custom Python modules to the Python path.
-#PYTHONPATH=$PYTHONPATH:~/slippenspythonlib
-#PYTHONPATH=$PYTHONPATH:~/usr/lib/python2.5/site-packages
-export PYTHONPATH
+    # MAN =====================================================================
+    # Custom man pages
+    export MANPATH=${LOCAL}/share/man:"$MANPATH"
 
+    # Add custom compiled libraries to library search path.
+    # You must run the following command to activate path: ldconfig
+    # Verify Your New Library Path: ldconfig -v | lessexport LD_LIBRARY_PATH=${LOCAL}/lib:"${LD_LIBRARY_PATH}"
+    export LIBRARY_PATH=${LOCAL}/lib:"${LIBRARY_PATH}"
+
+    # Add custom compiled libraries to library run path.
+    export LD_RUN_PATH=${LOCAL}/lib:"${LD_RUN_PATH}"
+
+    export CPATH=${LOCAL}/include:"${CPATH}"
+
+    # Make sure pkg-config can find self-compiled software
+    export PKG_CONFIG_PATH=${LOCAL}/lib/pkgconfig
+
+    # RUBY ====================================================================
+    # Ruby gems install locally.
+    export GEM_HOME="${LOCAL}"
+    export GEM_PATH="${GEM_HOME}:${GEM_PATH}"
+    export RUBYLIB="${GEM_HOME}/lib:${RUBY_LIB}"
+
+else
+
+    mkdir ${LOCAL}
+fi
+
+
+# PYTHON ======================================================================
+# Custom Python interactive session configuration.
+if [ -f "$HOME/.pythonrc" ]; then
+    export PYTHONSTARTUP="$HOME/.pythonrc"
+fi
 
 export PATH

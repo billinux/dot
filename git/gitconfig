@@ -83,9 +83,9 @@
     ui = auto
 
 [color "branch"]
-    current = yellow reverse
-    local = yellow
-    remote = green
+    current = green reverse
+    local = green
+    remote = red bold
 
 [color "diff"]
     meta = yellow bold

@@ -1,5 +1,15 @@
 // http://web-design-weekly.com/2013/05/12/handy-sass-mixins/
 
+
+// ========================================================================
+// COLOR
+// ========================================================================
+
+// Cette fonction retourne la valeur d’une couleur mélangé à un certain pourcentage de blanc.
+@function whiten($color, $percentage: 80%) {
+    @return mix($color, white, $percentage);
+}
+
 // ========================================================================
 // RESPONSIVE BREAKPOINTS
 // ========================================================================
@@ -93,9 +103,10 @@ Usage :
 // ROUNDED
 // ========================================================================
 @mixin x_rounded($side, $radius: 10px) {
-  border-#{$side}-radius: $radius;
-  -moz-border-radius-#{$side}: $radius;
   -webkit-border-#{$side}-radius: $radius;
+  -moz-border-radius-#{$side}: $radius;
+  -o-border-#{$side}-side: $radius;
+  border-#{$side}-radius: $radius;
 }
 /*
 Usage :
@@ -106,6 +117,7 @@ Usage :
   @include x_rounded(left, 8px); 
 }
 */
+
 
 // ========================================================================
 // OPACITY

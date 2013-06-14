@@ -16,3 +16,9 @@
 [submodule "vim/vimget"]
 	path = vim/vimget
 	url = git://github.com/billinux/vimget.git
+[submodule "scss/sass-mixins"]
+	path = scss/sass-mixins
+	url = git://github.com/web-design-weekly/sass-mixins.git
+[submodule "scss/color-me-sass"]
+	path = scss/color-me-sass
+	url = git://github.com/RichardBray/color-me-sass.git

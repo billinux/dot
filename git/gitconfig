@@ -1,30 +1,46 @@
 # vim:set filetype=gitconfig
 
 [alias]
-    #a = add
+    # add
     a = !git add . && git add -u && git status
-    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
     am = !git ls-files -m -z | xargs -0 git-add && git status                     # ajouter les fichiers modifiés.
-    amend = !git log -n 1 --pretty=tformat:%s%n%n%b | git commit -F - --amend
     au = !git ls-files -o --exclude-standard -z | xargs -0 git-add && git status  # ajouter les fichiers inconnus.
-    #begin=reset --hard # Note that this is dangerous!
-    br = branch
-    brv = !git br -av
+
+    # alias
+    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
+
+
+    # branch
+    br = branch -v
+    bra = branch  -av
+
     browse = !bash -c 'git fetch "$1" "$2" && git checkout FETCH_HEAD' - # Fetch a repository ($1) and checkout its ref ($2) HEAD
-    commit = commit -v
-    c = commit
+
+    # commit
+    c = commit -m
+    ca = commit -am
     ci = commit
-    cia = commit --amend
-    cs = commit -s
-    cl = clone
-    cleanup = !git clean -df && git stash clear
-    co = checkout
-    d = diff
-    dc = diff --cached
-    diffc = diff --cached   # Diff what is staged for the next commit
-    diffst = diff --stat    # Diff overview
+    commit = commit -v
+    amend = commit --amend
+    ammend = commit --amend
     fix = commit --amend -C HEAD
+
+    # checkout
+    co = checkout
+    cob = checkout -b # Create and switch into a new branch
+
+    # delete
+    rmm  = !git ls-files -d -z | xargs -0 git-rm && git status
+
+    # diff
+    d = diff
+    dc = diff --cached  # Diff what is staged for the next commit
+    ds = diff --stat    # Diff overview
+
+    # grep
     g = grep
+
+    # logs
     graph = log --pretty=nice --date-order --graph  # Custom graph log (append any tree-ish)
     grapha = log --pretty=nice --date-order --graph --all   # Custom graph log for all branches
     head = !"git log -n1"
@@ -36,33 +52,64 @@
     logp = log --pretty=nice --date-order   # Custom pretty log
     logsf = log --stat --format=oneline --abbrev-commit     # Short format diffstat log
     logst = log --stat  # Diffstat log
+
+    # merge
     m = merge
-    p = push
+
+    # pull
+    pl = pull                         # pull
+
+    # push
+    ps = push                         # push
+    ph = push
     pf = push -f
+
+    # rebase
+    ra = rebase --abort
+    rc = rebase --continue
+    ri = rebase --interactive
+    ri5 = rebase --interactive HEAD~5
+    ri10 = rebase --interactive HEAD~10
+    ri20 = rebase --interactive HEAD~20
+    rs = rebase --skip
+
+    # remote
     r = remote
-    rb = rebase
-    rba = rebase --abort
-    rbc = rebase --continue
-    rbi = rebase --interactive
-    rbi5 = rebase --interactive HEAD~5
-    rbi10 = rebase --interactive HEAD~10
-    rbi20 = rebase --interactive HEAD~20
-    rbs = rebase --skip
     ru = remote update
     rv = remote -v
-    rmm  = !git ls-files -d -z | xargs -0 git-rm && git status
-    sh = show
+
+    # reset
+    unstage = reset HEAD              # remove files from index (tracking)
+    uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+    filelog = log -u                  # show changes to a file
+    mt = mergetool                    # fire up the merge tool
+    #begin=reset --hard               # Note that this is dangerous!
+
+    # status
     s = status -sb
-    scoreboard = shortlog -sn
     st = status
+    stat = status
+
+    # stash
+    ss = stash                        # stash changes
+    sl = stash list                   # list stashes
+    sa = stash apply                  # apply stash (restore changes)
+    sd = stash drop                   # drop stashes (destory changes)
     stsh = !CURRENT=$(git symbolic-ref HEAD) && git symbolic-ref HEAD refs/heads/stash && git commit -a -m stashed && git checkout $CURRENT
-    t = tag
-    trim = !git remote prune origin && git gc
-    undo = !git reset --soft HEAD^
+
+    # tag
+    t = tag -n                        # show tags with <n> lines of each tag message
+
+    # misc
+    sh = show
+    scoreboard = shortlog -sn
+    trim = remote prune origin && git gc
     wc = whatchanged -p
     whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
     who = shortlog --numbered --summary --email --no-merges --since="3 months"  # Who is active committers on this repository
     whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    cl = clone
+    cleanup = !git clean -df && git stash clear
 
 [apply]
     # Detect whitespace errors when applying a patch
@@ -108,6 +155,9 @@
 [diff]
     renames = true    # Detect renames of files
 
+[format]
+    pretty = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
+
 [github]
     user = billinux
 
@@ -120,33 +170,45 @@
 
 [merge]
 	tool = vimdiff
+    summary = true
+    verbosity = 1
+
+[mergetool]
+    prompt = false
 
 [pretty]
     nice = "%C(yellow)%h%C(reset) %C(white)%s%C(cyan)%d%C(reset) -- %an; %ar"
 
 [push]
-	default = current
+    # 'git push' will push the current branch to its tracking branch
+    # the usual default is to push all branches
+    default = tracking
+    #default = current
 	#default = matching
-
-[user]
-	name = Bill Linux
-	email = bill.linux@laposte.net
 
 # URL shorthands
 [url "git@github.com:"]
 	insteadOf = "gh:"
 	pushInsteadOf = "github:"
 	pushInsteadOf = "git://github.com/"
+
 [url "git://github.com/"]
 	insteadOf = "github:"
+
 [url "git@gist.github.com:"]
 	insteadOf = "gst:"
 	pushInsteadOf = "gist:"
 	pushInsteadOf = "git://gist.github.com/"
+
 [url "git://gist.github.com/"]
 	insteadOf = "gist:"
+
 [url "git@git.joyent.com:"]
 	insteadOf = "gj:"
+
+[user]
+	name = Bill Linux
+	email = [email blocked]
 
 [vim]
 #	modeline = ts=8 sw=8 noet cin

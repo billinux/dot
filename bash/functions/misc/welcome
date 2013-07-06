@@ -1,0 +1,24 @@
+#!/bin/bash
+
+
+upinfo()    # Uptime info
+{
+    echo -ne "${YELLOW}Uptime${RESET}:\t\t\t${CYAN}";uptime | awk /'up/ {print $3,$4,$5,$6,$7,$8,$9,$10}'
+}
+
+welcome()   # Welcome message before prompting
+{
+    clear
+    echo -e "${RED}";figlet " ${OS^} Linux";echo "${RESET}"     # Capitalize a string : ${string^}
+    echo -ne "${YELLOW}Aujourd'hui${RESET}:\t\t${CYAN}"`date`; echo "${RESET}"
+    echo -e "${YELLOW}Distribution${RESET}:\t\t${CYAN}"`lsb_release -d | cut -f2`
+    echo -e "${YELLOW}Information du kernel${RESET}:\t${CYAN}"`uname -omr`
+    echo -e "${YELLOW}Hôte${RESET}: \t\t\t${CYAN}"`hostname -f`
+    echo -ne "${RESET}";upinfo;
+    case "$TERM" in
+        linux)  echo -e "${RESET}${WHITE}"; cal -3 ;;
+        *)      echo -e "${BOLD}${WHITE}"; cal -3 ;;
+    esac
+
+    echo "";
+}

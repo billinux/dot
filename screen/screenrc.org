@@ -1,0 +1,167 @@
+# vim: ft=screen
+#
+#
+# http://linux.dsplabs.com.au/gnu-screen-screenrc-configuration-file-p13/
+# http://blog.smartlogicsolutions.com/2010/01/22/ubuntu-byobu-landscape/
+# C-a :source .screenrc
+#
+# Splits a screen into two "regions"
+# ctrl-a tab   Go to next region
+# ctrl-a Q     Kill all regions except the one you are in
+#
+# ------------------------------------------------------------------------------
+# SCREEN SETTINGS
+# ------------------------------------------------------------------------------
+
+#shell bash
+startup_message off
+vbell off
+autodetach on
+altscreen on
+shelltitle "$ |t/bash"
+defscrollback 10000
+defutf8 on
+nonblock on
+
+#escape ``
+#escape `e
+
+# ------------------------------------------------------------------------------
+# TERMINAL SETTINGS
+# ------------------------------------------------------------------------------
+termcapinfo vt100 dl=5\E[M
+termcapinfo xterm*|rxvt*|kterm*|Eterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
+termcapinfo xterm*|linux*|rxvt*|Eterm* OP
+termcapinfo xterm 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+termcapinfo xterm* ti@:te@
+altscreen on
+
+##termcapinfo xterm*|Eterm|mlterm|rxvt 'hs:ts=\E]0;:fs=\007:ds=\E]0;screen\007'
+#termcapinfo rxvt-unicode ti@:te@     #enable SHIFT-PGUP / SHIFT-PGDOWN scroll
+#termcapinfo wy* CS=\E[?1h:CE=\E[?1l:vi=\E[?25l:ve=\E[?25h:VR=\E[?5h:VN=\E[?5l:cb=\E[1K:CD=\E[1J
+#terminfo rxvt-unicode ti@:te@:
+#term screen-256color
+
+
+# ------------------------------------------------------------------------------
+# SCREEN KEYBINDINGS
+# ------------------------------------------------------------------------------
+register n "^a^c^aA"
+register w "^a\""
+
+#bindkey -k F1 command
+bindkey -k k1 title         # F1  | Change title
+bindkey -k k2 process n     # F2  | Create new window (and name it)
+bindkey -k k3 prev          # F3  | Previous Window
+bindkey -k k4 next          # F4  | Next Window
+bindkey -k k5 process w     # F5  | Window List
+bindkey -k k6 detach        # F6  | Detach from this session
+bindkey -k k7 copy          # F7  | Enter copy/scrollback mode
+bindkey -k k8 kill          # F8  | Kill current window
+bindkey -k k9 lockscreen    # F9  | Lock this terminal screen
+bindkey -k k; split -v      # F10 | Vertical split
+bindkey -k F2 quit          # F12 | Exit
+
+
+# https://bbs.archlinux.org/viewtopic.php?id=55618
+
+bind = resize =
+bind + resize +1
+bind - resize -1
+bind _ resize max
+bind c screen 1 # Window numbering starts at 1, not 0.
+bind 0 select 10
+
+# make life easier, f1-f10 selects screens 0-9
+#bindkey -k k1 select 1
+#bindkey -k k2 select 2
+#bindkey -k k3 select 3
+#bindkey -k k4 select 4
+#bindkey -k k5 select 5
+#bindkey -k k6 select 6
+#bindkey -k k7 select 7
+#bindkey -k k8 select 8
+#bindkey -k k9 select 9
+#bindkey -k k0 select 0
+# windows select with Shift-Fn. May not work in all terminals.
+# (screen only seems to understand up to FA)
+#bindkey -k F3 select 1
+#bindkey -k F4 select 2
+#bindkey -k F5 select 3
+#bindkey -k F6 select 4
+#bindkey -k F7 select 5
+#bindkey -k F8 select 6
+#bindkey -k F9 select 7
+#bindkey -k FA select 8
+
+#bindkey -k k7 detach # bind F7  to detach screen session from this terminal
+#bindkey -k k8 kill   # bind F8  to kill current screen window.
+#bindkey -k k9 next   # bind F9 to move to previous window
+#bindkey -k F1 prev   # bind F11 to move to next window
+#bindkey -k F2 hardstatus alwaysignore # F12 to turn the status bar on
+#bindkey -k k9 screen # bind F9  to create a new screen
+#bindkey -k k; title  # bind F10 to rename current screen window
+#bindkey -k F1 prev   # bind F11 to move to previous window
+#bindkey -k F2 next   # bind F12 to move to next window
+
+# add CPU idle/sustem/user/interrupt stats
+#backtick 100 5 5 tail -1 /var/tmp/vermaden-stats-top
+#caption always '%{= wk} %= %100` %='
+
+bindkey "^[Od" prev  # change window with ctrl-left
+bindkey "^[Oc" next  # change window with ctrl-right
+
+
+# Remove some stupid / dangerous key bindings
+bind ^k
+#bind L
+bind ^\
+# Make them better
+bind \\ quit
+bind K kill
+bind I login on
+bind O login off
+bind } history
+
+#bind 'R' screen ssh s1554463@sunfire16
+#bind 'R' screen -t sunfire16 ssh s1554463@sunfire16
+bind 'q' quit
+
+
+# ------------------------------------------------------------------------------
+# STATUS LINES
+# ------------------------------------------------------------------------------
+
+hardstatus alwayslastline
+hardstatus alwaysfirstline
+#hardstatus string '%{= mK}%-Lw%{= KW}%50>%n%f* %t%{= mK}%+Lw%< %{= kG}%-=%D %d %M %Y %c:%s%{-}'
+#hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %d/%m %{W}%c %{g}]'
+hardstatus string '%{= kw}[ %{= kb}%H%{= kw} ][ %= %{= kw}%?%-Lw%?%{= kr}(%{= kW}%n*%f %t%?(%u)%?%{= kr})%{= kw}%?%+Lw%?%?%= %{w} ][ %{r}%l%{w} ]%{w}[%{r} %d/%m/%y %C %A %{w}]%{w}'
+#hardstatus string '%{= kw}[ %{= kb}%H%{= kw} ][%= %{= kw}%?%-Lw%?%{= kW}%n*%f %t%?%?%{= kw}%?%+Lw%?%?%= ][ %{r}%l%{w} ]%{w}[%{r} %d/%m/%y %C %A %{w}]%{w}'
+#hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
+#
+# ------------------------------------------------------------------------------
+# STARTUP SCREENS
+# ------------------------------------------------------------------------------
+# Multi windows in one "screen"
+# split or split -v, screen -t t/bla 1, screen -t t/blabla 2, select 1 or 2, focus down, split or screen ...., select ..,
+#
+#   Basedirectory for all new screens
+chdir .
+
+screen -t t/zsh 1 zsh
+screen -t t/root 2 su
+screen -t t/vim 3 bash
+screen -t t/deb 4 ssh christian@debian
+screen -t t/irc 5 irssi
+screen -t t/mutt 6 mutt
+#screen -t t/repo 7 bash -c 'cd ~/projets/config/dotfiles/vimfiles/repositories/perso/dotvim/; ls -la; exec bash'
+#screen -t t/log 8 sudo tail -f /var/log/messages
+
+select 6
+
+#chdir /hr
+#screen -t acer 0
+#screen -t kw64 1 ssh root@132.234.103.72 -t 'screen -d -RR kw64'
+#screen -t spl2 2 ssh root@132.234.103.113 -t 'screen -d -RR spl2'
+#screen -t sunfire 3 ssh s1554463@132.234.222.1 -t 'screen -d -RR spl'

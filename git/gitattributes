@@ -1,2 +1,13 @@
-# Automatically normalize line endings for all text-based files
-* text=auto
+# Auto detect text files and perform LF normalization
+*           text=auto
+
+*.java      text diff=java
+*.html      text diff=html
+*.css       text
+*.scss      text
+*.sass      text
+*.js        text
+*.sql       text
+
+*.docx      diff=astextplain
+*.DOCX      diff=astextplain

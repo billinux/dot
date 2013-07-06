@@ -1,0 +1,26 @@
+/*
+Framework blueprint CSS dissocié du DOM
+http://www.bugz.fr/2012/11/css-les-doigts-dans-le-nez-avec-compass/
+*/
+
+
+.main {
+    @include span(15);
+    @include prepend(1);
+    @include colborder(1);
+}
+.article {
+    @include span(7);
+    @include last() ;
+}
+
+/*
+<div class="container">
+  <div class="main">
+    <div class="article">
+      <h3>Title</h3>
+      <p>Bla bla</p>
+    </div>
+  </div>
+</div>
+*/

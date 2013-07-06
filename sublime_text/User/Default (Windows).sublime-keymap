@@ -1,0 +1,115 @@
+[
+
+	// Clic molette : sélection verticale
+	// Ctrl + Shift + P : Commandes
+	// Ctrl + P : Accès rapide aux fichiers
+	// Ctrl + G : Accès au numéro de ligne
+	// Ctrl + R : Accès direct par terme (par ex liste des sélecteurs en CSS)
+	// Ctrl + Shift + D : Dupliquer une ligne
+	// Ctrl + Shift + F : Recherche dans les fichiers du projet
+	// Ctrl + H : Remplacer
+	// Ctrl + X : Supprimer la ligne
+	// Ctrl + Shift + / : Mettre en commentaires (PHP, HTML, …)
+	// Ctrl + D : Sélectionner l’occurrence identique suivante
+	// Alt + F3 : Sélectionner toutes les occurrences (génial !)
+	// Ctrl + Shift + M : Sélectionner tout entre les parenthèses/accolades
+	// Ctrl + PageUp/PageDown : Se déplacer dans les onglets
+	// Ctrl + Shift + T : Réouvrir le dernier onglet fermé
+	// Alt + Shift + 1/2/3/4/5 : Vues splittées
+	// Ctrl + F2 : Placer un signet
+	// F2 : Aller au signet suivant
+	// Ctrl + KU : Met le texte sélectionné en uppercase
+	// Ctrl + KL : Met le texte sélectionné en lowercase
+	// F9 : tri par ordre alphabétique
+
+	/**
+	*	SideBarEnhancements
+	**/
+	{ "keys": ["ctrl+t"], "command": "side_bar_new_file2" },
+	{ "keys": ["f2"], "command": "side_bar_rename" },
+	{ "keys": ["ctrl+alt+f"], "command": "side_bar_find_files_path_containing" },
+
+	/**
+	* Nettuts Fetch
+	**/
+	{ "keys": ["ctrl+shift+e"], "command": "fetch" },
+
+	/**
+	*	Alignment
+	**/
+	{ "keys": ["ctrl+l"], "command": "alignment" , "context":
+		[
+			{ "key": "selection_empty", "operator": "equal", "operand": false, "match_all": true }
+		]
+	},
+
+	/**
+	*	Goto documentation
+	**/
+	{ "keys": ["f1"], "command": "goto_documentation" },
+
+
+	/**
+	 * Vintage mode
+	 * http://www.pagedegeek.com/2012/06/21/Sublime-text-mode-vintage.html
+	 */
+
+  	{ "keys": ["j", "j"], "command": "exit_insert_mode",
+    	"context":
+    	[
+      	{ "key": "setting.command_mode", "operand": false },
+      	{ "key": "setting.is_widget", "operand": false }
+    	]
+  	},
+
+  	{ "keys": ["k", "k"], "command": "exit_insert_mode",
+    	"context":
+    	[
+      	{ "key": "setting.command_mode", "operand": false },
+      	{ "key": "setting.is_widget", "operand": false }
+    	]
+  	},
+
+  	/**
+	 * Useful key bindings
+	 * alt+shift+t allows you to wrap a selection in a tag
+	 * (to quickly markup some HTML)
+	 */
+	{"keys"      :   ["alt+shift+t"], "command"   :   "insert_snippet",
+	"args": {"contents": "<${1:p}>${0:$SELECTION}</${1}>"}
+	},
+
+	{ "keys": ["ctrl+shift+r"], "command": "settings_refresh" },
+
+	{ "keys": ["ctrl+alt+r"], "command": "refresh_folder_list" },
+
+	{ "keys": ["alt+v"], "command": "paste_and_indent" },
+
+  	{ "keys": ["alt+shift+s"], "command": "reveal_in_side_bar" },
+
+  	{ "keys": ["ctrl+alt+s"], "command": "reveal_in_side_bar" },
+
+
+
+	/**
+	*	Ctrl + e => <?php echo ?> or <%= %>
+	**/
+	{ "keys": ["ctrl+e"], "command": "insert_snippet", "args": {"contents": "<?php echo ${1}; ?>${2}"},
+		"context": [{
+		"operand": "source.php, text.html",
+		"operator": "equal",
+		"match_all": true,
+		"key": "selector"
+		}]
+	},
+
+	{ "keys": ["ctrl+e"], "command": "insert_snippet", "args": {"contents": "<%= ${1} %>${2}"},
+		"context": [{
+	      "operand": "text.html.ruby",
+	      "operator": "equal",
+	      "match_all": true,
+	      "key": "selector"
+	    }]
+	}
+
+]

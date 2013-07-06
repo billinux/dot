@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# http://adriangerardcooke.com/useful-documentation/useful-command-line-snippets/
+
+img_resize()
+{
+    for f in */*
+    do
+        echo "Converting $f";
+        convert ./$f -resize 800x800 ./${f%.*}-resize.${f##*.};
+        exiftool -all= ./${f%.*}-resize.${f##*.};
+    done
+}

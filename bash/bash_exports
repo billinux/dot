@@ -24,36 +24,42 @@ export AROBAS=${RESET}
 export USER=${GREEN}
 export SSH_IP=`echo $SSH_CLIENT | awk '{ print $1 }'`
 
-# EDITOR ======================================================================
+[ "$(uname -s)" == [Ll]inux ] || export OS="$(lsb_release -si)"
 
-# Make vim the default editor
-if [ -x /usr/bin/vim ]; then
-  export EDITOR="vim"
-elif [ -x /bin/nano ]; then
-    export EDITOR="nano"
+
+export BASEHOSTNAME="`echo "$HOSTNAME" | cut -d. -f1`";
+
+if [ -d ~/tmp ]; then
+    export TMPDIR=~/tmp
 else
-    export EDITOR="vi"
+    mkdir ~/tmp 2>/dev/null
 fi
 
-# HISTORY =====================================================================
+# EDITOR ======================================================================
 
-# Larger bash history (allow 32³ entries; default is 500)
-# export HISTSIZE=32768
-# Unlimited history
-export HISTSIZE=
-export HISTFILESIZE=$HISTSIZE
-export HISTTIMEFORMAT="${RESET}${bo}${CDH}%d/%m/%Y${RESET}${bc} ${bo}${CHH}%H:%M:%S${RESET}${bc} "
-export HISTCONTROL=ignorespace:erasedups
-export HISTIGNORE="&:[bf]g:ls:cd:u:ll:l:la:l.:su:sbb:s:q:* --help"
-# allow ctrl-S for history navigation (with ctrl-R)
-stty -ixon
+# Check for the presence of 'vim'.
+VIMPATH=$(type -path vim 2>/dev/null);
+if [ $? -eq 0 ]; then HAVE_VIM=yes; else unset -v HAVE_VIM; fi
+
+if [ "$HAVE_VIM" ]; then
+  EDITOR=vim;
+else
+  EDITOR=vi;
+fi
+
+export EDITOR;
 
 # PAGER =======================================================================
 
-if [ -x /usr/bin/most ]; then
-  export PAGER='most -s'
+if type -p most > /dev/null 2>&1; then
+    PAGER='most -s'
+elif type -p less > /dev/null 2>&1; then
+    function pager() { less "$@"; }
+    function more()  { less "$@"; }
+    PAGER=less;
 else
-  export PAGER='less'
+    function pager() { more "$@"; }
+    PAGER=more;
 fi
 
 # Don’t clear the screen after quitting a manual page
@@ -64,6 +70,20 @@ export LESS="-iMFXR"
 
 # Highlight section titles in manual pages
 export LESS_TERMCAP_md="$ORANGE"
+
+
+# HISTORY =====================================================================
+
+# Larger bash history (allow 32³ entries; default is 500)
+# export HISTSIZE=32768
+# Unlimited history
+export HISTSIZE=
+export HISTFILESIZE=$HISTSIZE
+export HISTTIMEFORMAT="${RESET}${bo}${CDH}%d/%m/%Y${RESET}${bc} ${bo}${CHH}%H:%M:%S${RESET}${bc} "
+export HISTCONTROL=erasedups:ignorespace
+export HISTIGNORE="&:[bf]g:ls:cd:u:ll:l:la:l.:su:sbb:s:q:* --help"
+# allow ctrl-S for history navigation (with ctrl-R)
+stty -ixon
 
 # GREP ========================================================================
 
@@ -86,7 +106,6 @@ esac
 
 export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHSTATE=1
 
-
 # MISC ========================================================================
 
 # Export PhantomJS bin's location
@@ -95,27 +114,3 @@ export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWSTASHST
 # Make new shells get the history lines from all previous
 # shells instead of the default "last window closed" history
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-
-# Make sure pkg-config can find self-compiled software
-# and libraries (installed to ~/usr)
-PKG_CONFIG_PATH=$PKG_CONFIG_PATH:~/usr/lib/pkgconfig
-export PKG_CONFIG_PATH
-
-# Add custom compiled libraries to library search path.
-# You must run the following command to activate path: ldconfig
-# Verify Your New Library Path: ldconfig -v | less
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/local/lib
-export LD_LIBRARY_PATH
- 
-# Add custom compiled libraries to library run path.
-LD_RUN_PATH=$LD_RUN_PATH:~/local/lib
-export LD_RUN_PATH
- 
-# Add custom Python modules to the Python path.
-PYTHONPATH=$PYTHONPATH:~/slippenspythonlib
-PYTHONPATH=$PYTHONPATH:~/usr/lib/python2.5/site-packages
-export PYTHONPATH
-
-# Java;s CLASSPATH customization
-CLASSPATH=$CLASSPATH:~/foo/bar.jar
-export CLASSPATH

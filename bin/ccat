@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# http://www.softwaretalk.info/is-there-any-option-let-cat-command-output-with-color.htm
+# Prerequisites: $ sudo apt-get install source-highlight
+
+src-hilite-lesspipe.sh $1

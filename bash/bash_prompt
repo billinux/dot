@@ -2,6 +2,9 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
+# important:  The \[ and \] escapes delimit non-printing characters sequence.
+# Leaving them out probably breaks some terminal behaviour or internal bash parsing rules
+
 # http://www.git-attitude.fr/2010/07/14/le-prompt-bash-qui-change-la-vie-avec-git/
 
 # Miscelleanous functions
@@ -31,11 +34,43 @@ _chroot () #/*{{{*/
     fi
 }
 #/*}}}*/
+_git_dirty() # Returns "*" if the current git branch is dirty./*{{{*/
+{
+  [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo "*"
+}
+#/*}}}*/
+_git_num_unt() # Returns the number of untracked files/*{{{*/
+{
+    echo `git status --porcelain 2>/dev/null| grep "^??" | wc -l` # Number of untracked files
+}
+#/*}}}*/
+_git_num_unc() # Get number of files added to the index (but uncommitted)/*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^(M|A)" | wc -l)
+}
+#/*}}}*/
+_git_num_uncna() # Get number of files that are uncommitted and not added/*{{{*/
+{
+    echo $(git status --porcelain 2>/dev/null| grep "^ M" | wc -l)
+}
+#/*}}}*/
+_git_num_del() # Get number of files deleted to the index (but uncommited) /*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^D" | wc -l)
+}
+#/*}}}*/
+_git_num_delw() # Get number of files deleted to the work-tree /*{{{*/
+{
+
+    echo $(git status --porcelain 2>/dev/null| egrep "^ D" | wc -l)
+}
+#/*}}}*/
 
 # Functions for bash_prompt_git
 prompt_command () #/*{{{*/
 {
-#    GIT_REP=$(if [ -n "$(_git_prompt)" ]; then echo ${RESET}${bo}GIT::\W${RESET}${bc}${sp}; fi)
     GIT_REP=$(__gitdir)
     if [ "$?" -eq 0 ]; then errprompt=""; else errprompt="${sp}${bo}${BOLD}${error_color}error#$?${RESET}${bc}"; fi
 
@@ -71,6 +106,7 @@ __gitdir () #/*{{{*/
   fi
 }
 #/*}}}*/
+
 _git_prompt () #/*{{{*/
 {
   local g="$(__gitdir)"
@@ -134,12 +170,19 @@ _git_prompt () #/*{{{*/
       if [ -n "${GIT_PS1_SHOWDIRTYSTATE-}" ]; then
         if [ "$(git config --bool bash.showDirtyState)" != "false" ]; then
           git diff --no-ext-diff --ignore-submodules \
-            --quiet --exit-code || w=" working-tree${po}*${pc}"
+              --quiet --exit-code || w=" $(if [[ $(_git_num_delw) -gt 0 && $(_git_num_uncna) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_delw)-\|$(_git_num_uncna)*${pc}; elif [[ $(_git_num_uncna) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_uncna)*${pc}; elif [[ $(_git_num_delw) -gt 0 ]]; then \
+              echo w-tree${po}$(_git_num_delw)-${pc}; else \
+              echo w-tree${po}*${pc}; fi)"
           if git rev-parse --quiet --verify HEAD >/dev/null; then
             git diff-index --cached --quiet \
-              --ignore-submodules HEAD -- || i=" index${po}+${pc}"
+                --ignore-submodules HEAD -- || i=" $(if [[ $(_git_num_del) -gt 0 && $(_git_num_unc) -gt 0 ]]; then \
+                echo index${po}$(_git_num_del)-\|$(_git_num_unc)+${pc}; elif [[ $(_git_num_del) -gt 0 ]]; then \
+            echo index${po}$(_git_num_del)-${pc}; else \
+            echo index${po}$(_git_num_unc)+${pc}; fi)"
           else
-            i=" index${po}#${pc}"
+              i=" index${po}$(_git_num_unc)#${pc}"
           fi
         fi
       fi
@@ -149,7 +192,7 @@ _git_prompt () #/*{{{*/
 
       if [ -n "${GIT_PS1_SHOWUNTRACKEDFILES-}" ]; then
          if [ -n "$(git ls-files --others --exclude-standard)" ]; then
-           u=" untracked${po}%${pc}"
+             u=" u-tracked${po}$(_git_num_unt)?${pc}"
          fi
       fi
     fi
@@ -157,9 +200,8 @@ _git_prompt () #/*{{{*/
     if [ -n "${1-}" ]; then
       printf "$1" "$c${b##refs/heads/}$w$i$s$u$r"
     else
-      #printf "${bo}%s${bc}" "$c${b##refs/heads/}$w$i$s$u$r"
-      #printf "${bo}%s${bc}" "${PWD##*/}|$c${b##refs/heads/}$w$i$s$u$r"
       printf "%s" "$c${b##refs/heads/}$w$i$s$u$r"
+      #printf "%s" "$c${YELLOW}${b##refs/heads/}${RESET}$w$i$s$u$r"
     fi
   fi
 }
@@ -221,15 +263,15 @@ bash_prompt_git () #/*{{{*/
     [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
 
 export PS1="\
-\n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
-${bo}\[${PINK}\]\t\[${RESET}\]${bc}${sp}\
-${bo}\[${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\`[ $SSH_IP ] && echo \"${RESET}${po}ssh-from:${BOLD}${SSH_IP}${RESET}${pc}\"\`\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}/\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}/${CYAN}\${NB_SYMFILES}${PURPLE}/\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${ORANGE}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+\n\[${RESET}\]┌─${bo}\`if [ \$? = 0 ]; then echo \"\[${BOLD}${GREEN}\]!\!\[${RESET}\]\"; else echo \"\[${BOLD}${RED}\]!\!\[${RESET}\]\"; fi\`${bc}${sp}\
+${bo}\[${BOLD}${PINK}\]\t\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
+${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\[${RESET}\]:\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
+\`[ $SSH_IP ] && echo \"${RESET}${bo}ssh-from:${BOLD}${SSH_IP}${RESET}${bc}${sp}\"\`\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
-\`[ \$(__gitdir) ] && echo \"${bo}Git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
+\`[ \$(__gitdir) ] && echo \"${bo}git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
 ${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
 }
 #/*}}}*/

@@ -1,82 +1,214 @@
+# vim:set filetype=gitconfig
+
 [alias]
-	# View the SHA, description, and history graph of the latest 20 commits
-	l = log --pretty=oneline -n 20 --graph
-	# View the current working tree status using the short format
-	s = status -s
-	# Show the diff between the latest commit and the current state
-	d = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
-	# `git di $number` shows the diff between the state `$number` revisions ago and the current state
-	di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
-	# Pull in remote changes for the current repository and all its submodules
-	p = !"git pull; git submodule foreach git pull origin master"
-	# Clone a repository including all submodules
-	c = clone --recursive
-	# Commit all changes
-	ca = !git add -A && git commit -av
-	# Switch to a branch, creating it if necessary
-	go = checkout -B
-	# Show verbose output about tags, branches or remotes
-	tags = tag -l
-	branches = branch -a
-	remotes = remote -v
-	# Credit an author on the latest commit
-	credit = "!f() { git commit --amend --author \"$1 <$2>\" -C HEAD; }; f"
-	# Interactive rebase with the given number of latest commits
-	reb = "!r() { git rebase -i HEAD~$1; }; r"
+    # add
+    a = !git add . && git add -u && git status
+    am = !git ls-files -m -z | xargs -0 git-add && git status                     # ajouter les fichiers modifiés.
+    au = !git ls-files -o --exclude-standard -z | xargs -0 git-add && git status  # ajouter les fichiers inconnus.
+
+    # alias
+    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\\t => \\2/' | sort
+
+
+    # branch
+    br = branch -v
+    bra = branch  -av
+
+    browse = !bash -c 'git fetch "$1" "$2" && git checkout FETCH_HEAD' - # Fetch a repository ($1) and checkout its ref ($2) HEAD
+
+    # commit
+    c = commit -m
+    ca = commit -am
+    ci = commit
+    commit = commit -v
+    amend = commit --amend
+    ammend = commit --amend
+    fix = commit --amend -C HEAD
+
+    # checkout
+    co = checkout
+    cob = checkout -b # Create and switch into a new branch
+
+    # delete
+    rmm  = !git ls-files -d -z | xargs -0 git-rm && git status
+
+    # diff
+    d = diff
+    dc = diff --cached  # Diff what is staged for the next commit
+    ds = diff --stat    # Diff overview
+
+    # grep
+    g = grep
+
+    # logs
+    graph = log --pretty=nice --date-order --graph  # Custom graph log (append any tree-ish)
+    grapha = log --pretty=nice --date-order --graph --all   # Custom graph log for all branches
+    head = !"git log -n1"
+    heads = !"git log origin/master.. --format='%Cred%h%Creset;%C(yellow)%an%Creset;%H;%Cblue%f%Creset' | git name-rev --stdin --always --name-only | column -t -s';'"
+    ignore=!([ ! -e .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
+    last = log -1 HEAD
+    l = log -10 --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    ll = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    logp = log --pretty=nice --date-order   # Custom pretty log
+    logsf = log --stat --format=oneline --abbrev-commit     # Short format diffstat log
+    logst = log --stat  # Diffstat log
+
+    # merge
+    m = merge
+
+    # pull
+    pl = pull                         # pull
+
+    # push
+    ps = push                         # push
+    ph = push
+    pf = push -f
+
+    # rebase
+    ra = rebase --abort
+    rc = rebase --continue
+    ri = rebase --interactive
+    ri5 = rebase --interactive HEAD~5
+    ri10 = rebase --interactive HEAD~10
+    ri20 = rebase --interactive HEAD~20
+    rs = rebase --skip
+
+    # remote
+    r = remote
+    ru = remote update
+    rv = remote -v
+
+    # reset
+    unstage = reset HEAD              # remove files from index (tracking)
+    uncommit = reset --soft HEAD^     # go back before last commit, with files in uncommitted state
+    filelog = log -u                  # show changes to a file
+    mt = mergetool                    # fire up the merge tool
+    #begin=reset --hard               # Note that this is dangerous!
+
+    # status
+    s = status -sb
+    st = status
+    stat = status
+
+    # stash
+    ss = stash                        # stash changes
+    sl = stash list                   # list stashes
+    sa = stash apply                  # apply stash (restore changes)
+    sd = stash drop                   # drop stashes (destory changes)
+    stsh = !CURRENT=$(git symbolic-ref HEAD) && git symbolic-ref HEAD refs/heads/stash && git commit -a -m stashed && git checkout $CURRENT
+
+    # tag
+    t = tag -n                        # show tags with <n> lines of each tag message
+
+    # misc
+    sh = show
+    scoreboard = shortlog -sn
+    trim = remote prune origin && git gc
+    wc = whatchanged -p
+    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
+    who = shortlog --numbered --summary --email --no-merges --since="3 months"  # Who is active committers on this repository
+    whois = "!sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -"
+    cl = clone
+    cleanup = !git clean -df && git stash clear
 
 [apply]
-	# Detect whitespace errors when applying a patch
-	whitespace = fix
+    # Detect whitespace errors when applying a patch
+    whitespace = fix
 
-[core]
-	# Use custom `.gitignore` and `.gitattributes`
-	excludesfile = ~/.gitignore
-	attributesfile = ~/.gitattributes
-	# Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
-	whitespace = space-before-tab,indent-with-non-tab,trailing-space
+[branch]
+    # set up git pull to do a rebase instead of merge
+    autosetuprebase = always
+
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
 
 [color]
-	# Use colors in Git commands that are capable of colored output when outputting to the terminal
-	ui = auto
-[color "branch"]
-	current = yellow reverse
-	local = yellow
-	remote = green
-[color "diff"]
-	meta = yellow bold
-	frag = magenta bold
-	old = red bold
-	new = green bold
-[color "status"]
-	added = yellow
-	changed = green
-	untracked = cyan
-[merge]
-	# Include summaries of merged commits in newly created merge commit messages
-	log = true
+    diff = auto
+    status = auto
+    branch = auto
+    ui = auto
 
-# Use `origin` as the default remote on the `master` branch in all cases
-[branch "master"]
-	remote = origin
-	merge = refs/heads/master
+[color "branch"]
+    current = green reverse
+    local = green
+    remote = red bold
+
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = cyan
+
+[core]
+    autocrlf = false    # For dealing with Windows projects
+    pager = less -r     # Wrap long-lines when printing on the screen
+    excludesfile = ~/.gitignore     # Global gitignore
+    attributesfile = ~/.gitattributes   # Global attributes
+    whitespace = space-before-tab,indent-with-non-tab,trailing-space
+
+[diff]
+    renames = true    # Detect renames of files
+
+[format]
+    pretty = format:%C(blue)%ad%Creset %C(yellow)%h%C(green)%d%Creset %C(blue)%s %C(magenta) [%an]%Creset
+
+[github]
+    user = billinux
+
+[grep]
+    lineNumber = true
+    extendedRegexp = true
+
+[init]
+    #templatedir = ~/.git_template   # Default git hooks (will be copied over to each newly cloned repo)
+
+[merge]
+	tool = vimdiff
+    summary = true
+    verbosity = 1
+
+[mergetool]
+    prompt = false
+
+[pretty]
+    nice = "%C(yellow)%h%C(reset) %C(white)%s%C(cyan)%d%C(reset) -- %an; %ar"
+
+[push]
+    # 'git push' will push the current branch to its tracking branch
+    # the usual default is to push all branches
+    default = tracking
+    #default = current
+	#default = matching
 
 # URL shorthands
 [url "git@github.com:"]
 	insteadOf = "gh:"
 	pushInsteadOf = "github:"
 	pushInsteadOf = "git://github.com/"
+
 [url "git://github.com/"]
 	insteadOf = "github:"
+
 [url "git@gist.github.com:"]
 	insteadOf = "gst:"
 	pushInsteadOf = "gist:"
 	pushInsteadOf = "git://gist.github.com/"
+
 [url "git://gist.github.com/"]
 	insteadOf = "gist:"
 
-[push]
-#	default = simple
-	default = tracking
+[url "git@git.joyent.com:"]
+	insteadOf = "gj:"
+
 [user]
 	name = Bill Linux
 	email = bill.linux@laposte.net
+
+[vim]
+#	modeline = ts=8 sw=8 noet cin

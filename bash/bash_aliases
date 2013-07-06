@@ -50,6 +50,28 @@ if which grc &>/dev/null; then
     alias traceroute='.cl traceroute'
 fi
 # *}}}*/
+# Vi/*{{{*/
+# -------------------------------------------------------------------
+# I like to use Vim type editing of the command line, comment out
+# everything below if you prefer the default Emacs-style editing.
+
+set -o vi
+
+# ^p check for partial match in history
+bind -m vi-insert "\C-p":dynamic-complete-history
+
+# ^n cycle through the list of partial matches
+bind -m vi-insert "\C-n":menu-complete
+
+# ^l clear screen
+bind -m vi-insert "\C-l":clear-screen
+
+# ^b back a word
+bind -m vi-insert "\C-\e[C":backward-word
+
+# ^f forward a word
+bind -m vi-insert "\C-\e[D":forward-word
+# /*}}}*/
 # Confirm/*{{{*/
 # -------------------------------------------------------------------
 alias mvi='mv -iv'
@@ -80,7 +102,8 @@ alias shoptgrep='shopt|grep'
 alias ls='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F' # ls par default (dossier en 1er + mise en forme de l'heure)
 alias lsfp='ls | sed s#^#$(pwd)/#' # ls avec full PATH
 alias ll='ls -l'
-alias la='ls -la'
+alias lla='ls -la'
+alias la='ls -a'
 alias lt='ls -laptr'
 alias lsi='ls --si -s'
 alias ld='ls -la|grep ^d'
@@ -320,30 +343,35 @@ alias gitar="git ls-files -d -m -o -z --exclude-standard | xargs -0 git update-i
 # Remove git from a project
 alias ungit="find . -name '.git' -exec rm -rf {} \;"
 
-alias ga='git add'
+alias ga='git add . && git add -u && git status -sb'
+alias gau='git ls-files -o --exclude-standard -z | xargs -0 git-add && git status'
 alias gb='git branch'
 alias gba='git branch -a'
+alias gbs='git branch --set-upstream'   # To set-up tracking for an existing branch (foobranch origin/foobranch)
+alias gbt='git branch --track' # To track an already existing remote branch (foobranch origin/foobranch)
 alias gc='git commit -v'
-alias gca='git commit -a -m'
+alias gca='git commit -a'
+alias gcam='git commit -a -m'
+alias gcb='git checkout -b' # To track an already existing remote branch (foobranch origin/foobranch)
 alias gco='git checkout'
 alias gcp='git cherry-pick'
+alias gct='git checkout --track' # To track an already existing remote branch (origin/foobranch)
 alias gd='git diff | mate'
-alias ge='git commit --allow-empty -m "Initial commit"'
+alias gae='git commit --allow-empty -m "Initial commit"'
 alias gg='git grep'
 alias gi='git init'
 alias gk='gitk --all'
 alias gl='git pull --prune'
-# alias gp='git push origin HEAD'
-alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
-alias gp='git push'
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+alias gp='git push origin HEAD'
 alias gpd="git push origin develop"
 alias gpm="git push origin master"
 alias gs='git status -sb' # upgrade your git if -sb breaks for you. it's fun.
 alias gsb='git show-branch'
 alias gr='git rebase'
 alias gri='git rebase --interactive'
-#alias grm='git rm'
 alias grm="git status | grep deleted | awk '{print \$3}' | xargs git rm"
+alias gv="git remote -v"
 # /*}}}*/
 # Ssh/*{{{*/
 # -------------------------------------------------------------------

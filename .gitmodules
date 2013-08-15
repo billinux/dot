@@ -22,3 +22,12 @@
 [submodule "scss/color-me-sass"]
 	path = scss/color-me-sass
 	url = git://github.com/RichardBray/color-me-sass.git
+[submodule "dircolors/r/trapd00r"]
+	path = dircolors/r/trapd00r
+	url = git://github.com/trapd00r/LS_COLORS.git
+[submodule "dircolors/r/jmcantrell"]
+	path = dircolors/r/jmcantrell
+	url = git://github.com/jmcantrell/dircolors.git
+[submodule "dircolors/r/solarized"]
+	path = dircolors/r/solarized
+	url = git://github.com/seebi/dircolors-solarized.git

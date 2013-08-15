@@ -79,6 +79,8 @@ fi
 
 # DIRCOLORS ===================================================================
 
+# dircolors=$HOME/.dircolors-$(tput colors)
+
 # Setup for /bin/ls to support color, the alias is in /etc/bashrc.
 if type -p dircolors >/dev/null 2>&1; then
     NCOLORS=`tty -s && tput colors 2>/dev/null`

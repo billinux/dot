@@ -31,3 +31,6 @@
 [submodule "dircolors/r/solarized"]
 	path = dircolors/r/solarized
 	url = git://github.com/seebi/dircolors-solarized.git
+[submodule "apps/hub"]
+	path = apps/hub
+	url = git://github.com/github/hub.git

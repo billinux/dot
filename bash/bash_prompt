@@ -281,6 +281,7 @@ bash_prompt_alt () #/*{{{*/
 export PS1="\n\[${RESET}\]┌─${bo}\[${BOLD}${USER}\]\u@\h:\w\[${RESET}\]${bc}\$(prompt_vcs)\$(prompt_jobs)\n└─\$ \[${RESET}\]"
 }
 #/*}}}*/
+
 bash_prompt_off () #/*{{{*/
 {
     [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}

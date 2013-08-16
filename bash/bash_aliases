@@ -325,9 +325,8 @@ alias coding='cd $HOME/projets/coding/'
 # http://defunkt.github.com/hub/
 # http://defunkt.io/hub/
 # alias it as git
-hub_path=`which hub`
-if [ -e hub_path ] ; then
-    alias git='hub'
+if [ -e `which hub` ] ; then
+    eval "$(hub alias -s)" 
 fi
 
 #alias git='hub'

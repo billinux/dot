@@ -268,11 +268,11 @@ ${bo}\[${BOLD}${PINK}\]\t\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\[${RESET}\]:\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
 \`[ $SSH_IP ] && echo \"${RESET}${bo}ssh-from:${BOLD}${SSH_IP}${RESET}${bc}${sp}\"\`\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${BOLD}${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${BOLD}${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
 \`[ \$(__gitdir) ] && echo \"${bo}git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
-${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
+${bo}\[${BOLD}${USER}\]\\$\[${RESET}\]${bc} \[${RESET}\]"
 }
 #/*}}}*/
 bash_prompt_alt () #/*{{{*/

@@ -79,37 +79,12 @@ fi
 
 # DIRCOLORS ===================================================================
 
-# dircolors=$HOME/.dircolors-$(tput colors)
+dircolors=$HOME/.dircolors-$(tput colors)
 
-# Setup for /bin/ls to support color, the alias is in /etc/bashrc.
-if type -p dircolors >/dev/null 2>&1; then
-    NCOLORS=`tty -s && tput colors 2>/dev/null`
-    if [ -n "${NCOLORS}" -a "${NCOLORS}" -gt 1 -a "${PS1}" ] ; then
-        __TERM_HAS_COLORS="yes"
-
-        if [ "${OS}" = "Linux" ] ; then
-            COLORS=
-            for colors in "$HOME/.dir_colors.$TERM" "$HOME/.dircolors.$TERM" \
-                "$HOME/.dir_colors" "$HOME/.dircolors" "$HOME/.dircolors.$NCOLORS" \
-                "$HOME/.dircolors-$NCOLORS"; do
-                [ -e "$colors" ] && COLORS="$colors" && break
-            done
-
-            [ -z "$COLORS" ] && [ -e "/etc/dircolors.256color" ] && \
-            [ "x`tty -s && tput colors 2>/dev/null`" = "x256" ] && \
-            COLORS="/etc/dircolors.256color"
-
-            if [ -z "$COLORS" ]; then
-                for colors in "/etc/dircolors.$TERM" "/etc/dircolors"; do
-                    [ -e "$colors" ] && COLORS="$colors" && break
-                done
-            fi
-            # Existence of $COLORS already checked above.
-            if [ -n "$COLORS" ]; then
-                eval "`dircolors --sh "$COLORS" 2>/dev/null`"
-            fi
-        fi
-    fi
+if [[ -f $dircolors ]]; then
+    eval $(dircolors -b $dircolors)
+else
+    eval $(dircolors)
 fi
 
 # INPUTRC =====================================================================

@@ -47,6 +47,10 @@ if [ -d /usr/local/sbin -a $EUID -eq 0 ]; then
     pathprepend /usr/local/sbin
 fi
 
+if ! [ -d $HOME/bin ]; then
+    mkdir $HOME/bin
+fi
+
 for bindir in $HOME/bin $HOME/.dotfiles/bin $HOME/local/bin /opt/*/bin /usr/share/npm/bin ; do
     if [ -d $bindir ]; then
         pathprepend ${bindir}
@@ -102,7 +106,7 @@ if [ -d ${LOCAL} ]; then
 
 else
 
-    mkdir ${LOCAL}
+    mkdir -p ${LOCAL}/{lib,include,share/man}
 fi
 
 

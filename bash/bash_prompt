@@ -272,7 +272,7 @@ ${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${BOLD}${YELLOW}\]\${NB_TDIRS
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
 \`[ \$(__gitdir) ] && echo \"${bo}git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
-${bo}\[${BOLD}${USER}\]\\$\[${RESET}\]${bc} \[${RESET}\]"
+${bo}\[${BOLD}${USER}\]\$\[${RESET}\]${bc} \[${RESET}\]"
 }
 #/*}}}*/
 bash_prompt_alt () #/*{{{*/
@@ -310,6 +310,9 @@ esac
 # PS2 is the prompt you get when you extend a command over multiple lines
 # by putting at the end of a line and hitting return
 export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]" ;
+
+# PS3
+export PS3="? "
 
 # PS4 is the prompt shown when you set the debug mode on a shell script using set -x at the top of the script.
 # This echoes each line of the script to STDOUT before executing it.

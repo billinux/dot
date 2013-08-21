@@ -34,3 +34,6 @@
 [submodule "apps/hub"]
 	path = apps/hub
 	url = git://github.com/github/hub.git
+[submodule "zsh/zsh-vcs-prompt"]
+	path = zsh/zsh-vcs-prompt
+	url = git://github.com/yonchu/zsh-vcs-prompt.git

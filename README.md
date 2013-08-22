@@ -9,3 +9,5 @@
   *First major release*
 * 05.07.2013 à 21:26: dotfiles 0.3.1 released
   *Fix README.md file*
+22.08.2013 à 17:53: dotfiles 0.4 released
+Improve bash files and dircolors

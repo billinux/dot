@@ -268,7 +268,7 @@ ${bo}\[${BOLD}${PINK}\]\t\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${PURPLE}\]$(date +"%d/%m/%Y")\[${RESET}\]${bc}${sp}\
 ${bo}\[${BOLD}${USER}\]\u\[${AROBAS}\]@\[${RESET}\]\[${BOLD}${USER}\]\h\[${RESET}\]:\[${BOLD}${BLUE}\]\${CURRENT_DIR}\[${RESET}\]${bc}${sp}\
 \`[ $SSH_IP ] && echo \"${RESET}${bo}ssh-from:${BOLD}${SSH_IP}${RESET}${bc}${sp}\"\`\
-${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
+${bo}\[${BOLD}${ORANGE}\]\${NB_DIRS}\[${RESET}\]/\[${BOLD}${YELLOW}\]\${NB_TDIRS}\[${RESET}\]${po}d${pc},\[${BOLD}${PURPLE}\]\${NB_FILES}\[${RESET}\]/${CYAN}\${NB_SYMFILES}${PURPLE}\[${RESET}\]/\[${YELLOW}\]\${NB_TFILES}\[${RESET}\]${po}f${pc},\[${YELLOW}\]\${FILES_SIZE}\[${RESET}\]${bc}\
 \n└─${bo}Jobs:\[${BOLD}${USER}\]\j\[${RESET}\]${bc}\[${RESET}\]${sp}\
 \$(_chroot)\
 \`[ \$(__gitdir) ] && echo \"${bo}git::\[${USER}\]\$(_git_rep)\[${RESET}\]|\$(_git_prompt)\[${RESET}\]${bc}${sp}\"\`\
@@ -281,6 +281,7 @@ bash_prompt_alt () #/*{{{*/
 export PS1="\n\[${RESET}\]┌─${bo}\[${BOLD}${USER}\]\u@\h:\w\[${RESET}\]${bc}\$(prompt_vcs)\$(prompt_jobs)\n└─\$ \[${RESET}\]"
 }
 #/*}}}*/
+
 bash_prompt_off () #/*{{{*/
 {
     [ $UID -eq "0" ] && USER=${RED} && ${AROBAS}
@@ -309,6 +310,9 @@ esac
 # PS2 is the prompt you get when you extend a command over multiple lines
 # by putting at the end of a line and hitting return
 export PS2="\[${BOLD}${USER}\]continue → \[${RESET}\]" ;
+
+# PS3
+export PS3="? "
 
 # PS4 is the prompt shown when you set the debug mode on a shell script using set -x at the top of the script.
 # This echoes each line of the script to STDOUT before executing it.

@@ -12,8 +12,50 @@
 # interdire l'écrasement de fichier avec >
 #set -c
 
+
+# -----------------------------------------------------------------------------
+# Alias for host and user names
+#
+
+# Provide user name alias for prompt
+__user_alias() {
+    case `whoami` in
+        root)
+            echo -n "###" ;;
+        christian)
+            echo -n ".1" ;;
+        *)
+            echo -n "" ;;
+    esac
+}
+
+# Provide host tags
+case `hostname -f` in
+    *.glad.internal)
+        HOST_TAGS=":server:" ;;
+    zannanna* | bill*)
+        HOST_TAGS=":workstation:" ;;
+    *)
+        HOST_TAGS="" ;;
+esac
+
+export HOST_TAGS
+
+
+# Provide host alias names
+case `hostname -f` in
+    debian*)
+        HOST_ALIAS="(^-^)" ;;
+    *.glad.intenal)
+        HOST_ALIAS="glad" ;;
+esac
+
+[ -n "${HOST_ALIAS}" ] && export HOST_ALIAS
+
+
+
 # alias/*{{{*/
-# =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+# -----------------------------------------------------------------------------
 # sudo/*{{{*/
 # -------------------------------------------------------------------
 # very important for using some aliases with "sudo"
@@ -99,7 +141,7 @@ alias shoptgrep='shopt|grep'
 # /*}}}*/
 # Ls/*{{{*/
 # -------------------------------------------------------------------
-alias ls='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F' # ls par default (dossier en 1er + mise en forme de l'heure)
+alias lg='ls --group-directories-first --time-style=+"%d.%m.%Y %H:%M" --color=auto -F' # ls par default (dossier en 1er + mise en forme de l'heure)
 alias lsfp='ls | sed s#^#$(pwd)/#' # ls avec full PATH
 alias ll='ls -l'
 alias lla='ls -la'
@@ -325,10 +367,9 @@ alias coding='cd $HOME/projets/coding/'
 # http://defunkt.github.com/hub/
 # http://defunkt.io/hub/
 # alias it as git
-#hub_path=`which hub`
-#if [ -e hub_path ] ; then
-#    alias git='hub'
-#fi
+if [ -e `which hub` ] ; then
+    eval "$(hub alias -s)" 
+fi
 
 #alias git='hub'
 

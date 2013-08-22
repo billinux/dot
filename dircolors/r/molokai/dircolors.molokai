@@ -1,5 +1,4 @@
-# vim: ai ts=2 sw=2 et sts=2 ft=sh
-
+# vim: set filetype=bash :
 # Install: `ln -s ~/.bash/dircolors ~/.dircolors`
 # Configuration file for the color ls utility
 # This file goes in the /etc directory, and must be world readable.

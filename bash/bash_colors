@@ -2,15 +2,13 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
-if [[ $COLORTERM = gnome-* && $TERM = xterm ]] && infocmp gnome-256color >/dev/null 2>&1; then
-	export TERM=gnome-256color
-elif infocmp xterm-256color >/dev/null 2>&1; then
-	export TERM=xterm-256color
-fi
+
+
+
 
 if tput setaf 1 &> /dev/null; then
 	tput sgr0
-	if [[ $(tput colors) -ge 256 ]] 2>/dev/null; then
+	if [ $(tput colors) -ge 256 ] 2>/dev/null; then
 
         BLACK=$(tput setaf 0)
 		MAGENTA=$(tput setaf 9)
@@ -59,11 +57,8 @@ if tput setaf 1 &> /dev/null; then
         CHH=$(tput setaf 3)
 	fi
 
-    case $TERM in
-        rxvt*)  BOLD=$(tput smso) ;;
-        *)      BOLD=$(tput bold) ;;
-    esac
-
+    #BOLD=$(tput smso)      # set bold mode for rxvt terminal
+    BOLD=$(tput bold)
 	RESET=$(tput sgr0)      # Turn off all
 
     REVERSE=$(tput smso)    # reverse
@@ -148,3 +143,4 @@ export BOLD
 export CLIGN
 export UNDER
 export RESET
+

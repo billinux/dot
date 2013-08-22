@@ -93,8 +93,9 @@ stty -ixon
 export GREP_OPTIONS="--color=auto"
 
 # one can set GREP_OPTIONS to "--color=auto --binary-files=without-match --line-number --ignore-case"
-case "$TERM" in
-    linux|xterm*)
+COLORS=$(tty -s && tput colors)
+case "$COLORS" in
+    8)
         export GREP_COLOR='01;32'
         ;;
     *)

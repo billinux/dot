@@ -1,0 +1,108 @@
+#!/bin/bash
+#
+#
+# -----------------------------------------------------------------------------
+# Bash Prompt
+
+
+
+# Functions for bash prompt
+# -----------------------------------------------------------------------------
+
+# Date and time
+# -------------------------------------
+
+# Time
+__prompt() {
+    echo -n `date +%H%M`
+}
+
+# Working directory
+# -------------------------------------
+
+# Compactify a path
+
+__dir_chomp() {
+    local p=${1/#$HOME/\~} b s
+    # Remove [ and ] from strings
+    # (also, regular expression matching on [ ] below creates infinite recursion.)
+    p=${p//[/ }
+    p=${p//]/ }
+    # Remove multiple spaces, don't need them
+    p=${p// / }
+    s=${#p}
+    while [[ $p != ${p//\/} ]] && (($s>$2))
+    do
+        p=${p#/}
+        [[ $p =~ \.?. ]]
+        b=$b/${BASH_REMATCH[0]}
+        p=${p#*/}
+        ((s=${#b}+${#p}))
+    done
+    echo ${b/\/~/\~}${b+/}$p
+}
+
+# Compact version of current working directory
+__prompt_pwd() {
+    echo -n $(__dir_chomp "$(pwd)" 25)
+}
+
+# SSH
+# -------------------------------------
+
+# SSH agent indicator
+__prompt_ssh_agent() {
+    if [ -n "${SSH_CLIENT}" ] && [ -n "${SSH_AUTH_SOCK}" ] && [ -e "${SSH_AUTH_SOCK}" ]; then
+        echo -n "@"
+    fi
+}
+
+# SSH session indicator
+__prompt_ssh() {
+    if [ -n "${SSH_CLIENT}" ]; then
+        echo -n "ssh"
+    fi
+}
+
+
+
+
+
+# Functions for vcs prompt
+# -----------------------------------------------------------------------------
+# Git
+git_dir() {
+}
+
+# SVN
+svn_dir() {
+}
+
+# Hg (Mercurial)
+hg_dir() {
+}
+
+# Server prompt
+
+# Workstation prompt
+
+# Alternative prompt
+
+# Set up prompt
+# -----------------------------------------------------------------------------
+
+__prompt_activate() {
+
+# Select host name color on HOST_TAGS environment variable (in bash_alias file)
+
+case ${HOST_TAGS} in
+    *:server:*)
+        local HOST_COLOR=${BLACK}${RED_B} ;;
+    *:workstation:*)
+        local HOST_COLOR=${BLUE} ;;
+    *)
+        local HOST_COLOR=${WHITE}${BLACK_B} ;;
+esac
+
+}
+

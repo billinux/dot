@@ -2,6 +2,10 @@
 
 # vim: ai ts=2 sw=2 et sts=2
 
+
+
+
+
 if tput setaf 1 &> /dev/null; then
 	tput sgr0
 	if [ $(tput colors) -ge 256 ] 2>/dev/null; then
@@ -139,3 +143,4 @@ export BOLD
 export CLIGN
 export UNDER
 export RESET
+
